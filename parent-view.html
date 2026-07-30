@@ -137,16 +137,29 @@ async function fetchCloudData(){
   try{
     const url=GH_RAW+'?t='+Date.now();
     const resp=await fetch(url,{cache:'no-store'});
-    if(!resp.ok)return null;
+    if(!resp.ok){
+      console.log('fetchCloudData: resp not ok', resp.status);
+      return null;
+    }
     return await resp.json();
-  }catch(e){return null;}
+  }catch(e){
+    console.log('fetchCloudData error:', e.message);
+    return null;
+  }
 }
 
 async function loadStudentByToken(token){
   const data=await fetchCloudData();
-  if(!data)return null;
+  if(!data){
+    console.log('loadStudentByToken: no data from cloud');
+    return null;
+  }
   const student=(data.students||[]).find(s=>s.token===token);
-  if(!student)return null;
+  if(!student){
+    console.log('loadStudentByToken: student not found, token=', token);
+    console.log('available tokens:', (data.students||[]).map(s=>s.token));
+    return null;
+  }
   const feedbacks=(data.feedbacks||[]).filter(f=>f.studentId===student.id)
     .sort((a,b)=>b.date.localeCompare(a.date));
   return {student,feedbacks,teacher:data.teacher||{}};
@@ -182,7 +195,7 @@ async function init(){
   const data=await loadStudentByToken(token);
   if(!data){
     document.getElementById('main').innerHTML=`
-      <div class="empty"><div class="ic">😕</div><div>链接无效或已过期</div><div style="font-size:12px;margin-top:8px;">请联系老师获取最新链接</div></div>`;
+      <div class="empty"><div class="ic">😕</div><div>链接无效或已过期</div><div style="font-size:12px;margin-top:8px;">请联系老师获取最新链接</div><div style="font-size:11px;color:var(--sub);margin-top:8px;">token: ${token}</div></div>`;
     return;
   }
   session={...data,unlocked:false};
