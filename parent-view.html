@@ -130,20 +130,15 @@ function getToken(){
   return token;
 }
 
-// GitHub API 配置 - 从云端读取数据
-const GH_OWNER='Douououououou';
-const GH_REPO='solo-english-feedback';
-const GH_FILE='data.json';
-const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+// GitHub Pages 直接读取 data.json（不需要 API token）
+const GH_RAW='https://douououououou.github.io/solo-english-feedback/data.json';
 
 async function fetchCloudData(){
   try{
-    const resp=await fetch(GH_API,{
-      headers:{'Accept':'application/vnd.github+json'}
-    });
+    const url=GH_RAW+'?t='+Date.now();
+    const resp=await fetch(url,{cache:'no-store'});
     if(!resp.ok)return null;
-    const json=await resp.json();
-    return JSON.parse(decodeURIComponent(escape(atob(json.content))));
+    return await resp.json();
   }catch(e){return null;}
 }
 
