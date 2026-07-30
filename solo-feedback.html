@@ -173,47 +173,154 @@
 
 <script>
 const LS_KEY='solo_feedback_v2';
+// GitHub API 配置 - 用仓库当云端数据库
+const GH_OWNER='Douououououou';
+const GH_REPO='solo-english-feedback';
+const GH_FILE='data.json';
+let GH_TOKEN=localStorage.getItem('gh_token')||''; // 老师输入后存 localStorage
+let GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+
 const Store={
   data:null,
-  load(){try{const raw=localStorage.getItem(LS_KEY);if(raw){this.data=JSON.parse(raw);return;}}catch(e){}this.data=this.seed();this.save();},
-  save(){localStorage.setItem(LS_KEY,JSON.stringify(this.data));},
+  sha:null, // GitHub 文件的 sha，更新时需要
+  loading:false,
+
+  // 从 GitHub 加载数据
+  async load(){
+    // 如果没有 token，提示老师输入
+    if(!GH_TOKEN){
+      this.promptToken();
+      return;
+    }
+    await this.fetchFromGitHub();
+  },
+
+  promptToken(){
+    document.getElementById('main').innerHTML=`
+      <div style="padding:30px 20px;">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="font-size:36px;margin-bottom:8px;">🔑</div>
+          <h2 style="margin:0 0 6px;">首次使用</h2>
+          <p style="color:var(--sub);font-size:13px;margin:0;">请输入 GitHub Token 以连接云端存储</p>
+        </div>
+        <div class="field">
+          <label>GitHub Personal Access Token</label>
+          <input class="input" id="tokenInput" placeholder="github_pat_..." style="font-size:13px;letter-spacing:0;"/>
+        </div>
+        <button class="btn block" onclick="saveToken()">连接</button>
+        <div style="font-size:12px;color:var(--sub);margin-top:12px;line-height:1.6;">
+          Token 只会保存在本设备浏览器中，不会上传。<br/>
+          家长端不需要 Token，可以正常查看。
+        </div>
+      </div>`;
+  },
+
+  async fetchFromGitHub(){
+    // 先尝试 localStorage（离线缓存）
+    try{
+      const raw=localStorage.getItem(LS_KEY);
+      if(raw){
+        const cached=JSON.parse(raw);
+        this.data=cached.data;
+        this.sha=cached.sha;
+      }
+    }catch(e){}
+
+    // 从 GitHub 拉取最新数据
+    try{
+      const resp=await fetch(GH_API,{
+        headers:{
+          'Authorization':`token ${GH_TOKEN}`,
+          'Accept':'application/vnd.github+json',
+        }
+      });
+      if(resp.ok){
+        const json=await resp.json();
+        this.sha=json.sha;
+        this.data=JSON.parse(decodeURIComponent(escape(atob(json.content))));
+        // 缓存到 localStorage
+        localStorage.setItem(LS_KEY,JSON.stringify({data:this.data,sha:this.sha}));
+        return;
+      }else if(resp.status===404){
+        // 仓库里还没有 data.json，用种子数据初始化
+        if(!this.data){
+          this.data=this.seed();
+        }
+        await this.save();
+        return;
+      }
+    }catch(e){console.log('GitHub fetch failed:',e);}
+
+    // GitHub 没有数据，用种子数据
+    if(!this.data){
+      this.data=this.seed();
+      await this.save();
+    }
+  },
+
+  // 保存到 GitHub（异步，不阻塞UI）
+  async save(){
+    // 先更新本地缓存
+    localStorage.setItem(LS_KEY,JSON.stringify({data:this.data,sha:this.sha}));
+    
+    // 推送到 GitHub（防抖：500ms内的多次保存只执行一次）
+    if(this._saveTimer){clearTimeout(this._saveTimer);}
+    this._saveTimer=setTimeout(async()=>{
+      try{
+        const content=btoa(unescape(encodeURIComponent(JSON.stringify(this.data))));
+        const body={message:'update data',content};
+        if(this.sha)body.sha=this.sha;
+        
+        const resp=await fetch(GH_API,{
+          method:'PUT',
+          headers:{
+            'Authorization':`token ${GH_TOKEN}`,
+            'Accept':'application/vnd.github+json',
+            'Content-Type':'application/json',
+          },
+          body:JSON.stringify(body)
+        });
+        if(resp.ok){
+          const json=await resp.json();
+          this.sha=json.content.sha;
+          localStorage.setItem(LS_KEY,JSON.stringify({data:this.data,sha:this.sha}));
+        }
+      }catch(e){console.log('GitHub save failed:',e);}
+    },500);
+  },
+
   seed(){
     const today=new Date();
     const ymd=d=>{const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`;};
     const dPlus=n=>{const d=new Date(today);d.setDate(d.getDate()+n);return ymd(d);};
     return {
       teacher:{name:'Tina老师',school:'独立英语工作室'},
-      students:[
-        {id:'s1',name:'林小明',className:'Power Up 1 周六班',parentName:'林妈妈',password:'8888',token:'a7f3k9x2m1b4c8d1',createdAt:dPlus(-30),
-         assessment:{id:'a1',date:dPlus(-28),reading:85,listening:78,speaking:72,writing:80,vocabulary:75,grammar:70,
-           overall:'B',
-           analysis:'🌟 优势分析：\n阅读理解能力较强（85分），能较好地理解英文文本主旨和细节。写作基础扎实（80分），句子结构基本正确，能独立完成短文写作。\n\n⚠️ 不足之处：\n口语表达是当前相对薄弱环节（72分），开口信心不足，建议多进行朗读和复述练习。语法知识点掌握不够牢固（70分），特别是在时态运用上容易混淆。词汇量有待扩充（75分），建议每天坚持积累5-8个新词。\n\n🎯 学习目标：\n1. 短期目标（1个月）：提升口语表达信心，课堂主动发言次数增加50%\n2. 中期目标（2个月）：语法时态正确率达到85%以上，词汇量扩充至课程要求水平\n3. 长期目标：达到Power Up 1课程优秀标准，为KET考试打好基础',
-           createdAt:dPlus(-28)}},
-        {id:'s2',name:'王语桐',className:'Power Up 1 周日班',parentName:'王爸爸',password:'6666',token:'b8g4l0y3n2c5d9e2',createdAt:dPlus(-30)},
-        {id:'s3',name:'张乐怡',className:'启蒙周三班',parentName:'张妈妈',password:'9999',token:'c9h5m1z4o3d6e0f3',createdAt:dPlus(-15)},
-      ],
-      feedbacks:[
-        {id:'f1',studentId:'s1',date:dPlus(-14),lesson:'Power Up 1 Unit 3',
-         homeworkDone:true,homeworkDetail:'作业完成认真，书写工整，正确率高',attentive:true,participated:true,
-         tone:'温和',note:'',dictation:'90分',quiz:'',assessment:'',
-         generated:'林妈妈您好！今天林小明的Power Up 1 Unit 3课程反馈如下：\n\n✅ 课后作业：已完成\n📝 作业情况：作业完成认真，书写工整，正确率高\n✅ 上课状态：认真听讲，专注度高\n✅ 课堂互动：积极参与，表现活跃\n\n📊 测评成绩：听写：90分\n\n整体来看林小明今天表现不错，继续加油！有任何问题随时联系我。'},
-        {id:'f2',studentId:'s1',date:dPlus(-7),lesson:'Power Up 1 Unit 3 复习',
-         homeworkDone:true,homeworkDetail:'基本完成，但拼写部分有3处错误',attentive:true,participated:false,
-         tone:'专业',note:'拼写需加强',dictation:'75分',quiz:'8/10',assessment:'',
-         generated:'林妈妈您好！今天林小明的Power Up 1 Unit 3 复习课程反馈如下：\n\n✅ 课后作业：已完成\n📝 作业情况：基本完成，但拼写部分有3处错误\n✅ 上课状态：认真听讲，专注度高\n⚠️ 课堂互动：参与度不高，建议多鼓励开口\n\n📊 测评成绩：听写：75分 · 小测：8/10\n\n💡 补充说明：拼写需加强\n\n以上为本节课的客观反馈，如有疑问欢迎沟通。'},
-        {id:'f3',studentId:'s2',date:dPlus(-7),lesson:'Power Up 1 Unit 2 测试',
-         homeworkDone:true,homeworkDetail:'全部完成，质量优秀',attentive:true,participated:true,
-         tone:'表扬',note:'',dictation:'95分',quiz:'10/10',assessment:'优秀',
-         generated:'王爸爸您好！今天王语桐的Power Up 1 Unit 2 测试课程反馈如下：\n\n✅ 课后作业：已完成\n📝 作业情况：全部完成，质量优秀\n✅ 上课状态：认真听讲，专注度高\n✅ 课堂互动：积极参与，表现活跃\n\n📊 测评成绩：听写：95分 · 小测：10/10 · 阶段测评：优秀\n\n王语桐今天简直不要太优秀！必须大力表扬，继续保持这个状态！'},
-        {id:'f4',studentId:'s3',date:dPlus(-4),lesson:'启蒙 Unit 5 颜色',
-         homeworkDone:true,homeworkDetail:'涂色作业完成很好，能说出6种颜色',attentive:true,participated:true,
-         tone:'阳光',note:'',dictation:'',quiz:'',assessment:'',
-         generated:'张妈妈您好！今天张乐怡的启蒙 Unit 5 颜色课程反馈如下：\n\n✅ 课后作业：已完成\n📝 作业情况：涂色作业完成很好，能说出6种颜色\n✅ 上课状态：认真听讲，专注度高\n✅ 课堂互动：积极参与，表现活跃\n\n张乐怡今天超棒！每一份努力都在为未来铺路，继续闪闪发光吧！'},
-      ],
+      students:[],
+      feedbacks:[],
     };
   }
 };
-Store.load();
+// 异步加载数据
+document.getElementById('main').innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--sub);"><div style="font-size:36px;margin-bottom:12px;">⏳</div><div>正在加载...</div></div>';
+Store.load().then(()=>{
+  if(Store.data)navigate('dashboard');
+}).catch(()=>{
+  document.getElementById('main').innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--sub);"><div style="font-size:36px;margin-bottom:12px;">⚠️</div><div>加载失败，请检查网络后刷新</div></div>';
+});
+
+function saveToken(){
+  const t=document.getElementById('tokenInput').value.trim();
+  if(!t){U.toast('请输入Token');return;}
+  if(!t.startsWith('github_pat_')){U.toast('Token格式不正确');return;}
+  GH_TOKEN=t;
+  localStorage.setItem('gh_token',t);
+  document.getElementById('main').innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--sub);"><div style="font-size:36px;margin-bottom:12px;">⏳</div><div>正在连接云端...</div></div>';
+  Store.fetchFromGitHub().then(()=>{
+    if(Store.data)navigate('dashboard');
+  });
+}
+
+const getD=()=>Store.data;
 
 const U={
   id:()=>Math.random().toString(36).slice(2,9),
@@ -226,9 +333,11 @@ const U={
   escape(s){return(s??'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 };
 
-const D=Store.data;
-const getStudent=id=>D.students.find(s=>s.id===id);
-const getStudentFeedbacks=sid=>D.feedbacks.filter(f=>f.studentId===sid).sort((a,b)=>b.date.localeCompare(a.date));
+const getStudent=id=>Store.data.students.find(s=>s.id===id);
+const getStudentFeedbacks=sid=>Store.data.feedbacks.filter(f=>f.studentId===sid).sort((a,b)=>b.date.localeCompare(a.date));
+
+// D 作为 Store.data 的快捷引用（在页面渲染时动态获取）
+const D=new Proxy({},{get(t,k){return Store.data[k];},set(t,k,v){Store.data[k]=v;return true;}});
 
 // 话术生成器
 const TONE_TEMPLATES={

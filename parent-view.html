@@ -130,22 +130,36 @@ function getToken(){
   return token;
 }
 
-function loadStudentByToken(token){
+// GitHub API 配置 - 从云端读取数据
+const GH_OWNER='Douououououou';
+const GH_REPO='solo-english-feedback';
+const GH_FILE='data.json';
+const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+
+async function fetchCloudData(){
   try{
-    const raw=localStorage.getItem('solo_feedback_v2');
-    if(!raw)return null;
-    const data=JSON.parse(raw);
-    const student=data.students.find(s=>s.token===token);
-    if(!student)return null;
-    const feedbacks=data.feedbacks.filter(f=>f.studentId===student.id)
-      .sort((a,b)=>b.date.localeCompare(a.date));
-    return {student,feedbacks,teacher:data.teacher};
+    const resp=await fetch(GH_API,{
+      headers:{'Accept':'application/vnd.github+json'}
+    });
+    if(!resp.ok)return null;
+    const json=await resp.json();
+    return JSON.parse(decodeURIComponent(escape(atob(json.content))));
   }catch(e){return null;}
+}
+
+async function loadStudentByToken(token){
+  const data=await fetchCloudData();
+  if(!data)return null;
+  const student=(data.students||[]).find(s=>s.token===token);
+  if(!student)return null;
+  const feedbacks=(data.feedbacks||[]).filter(f=>f.studentId===student.id)
+    .sort((a,b)=>b.date.localeCompare(a.date));
+  return {student,feedbacks,teacher:data.teacher||{}};
 }
 
 let session={student:null,feedbacks:[],teacher:null,unlocked:false};
 
-function init(){
+async function init(){
   const token=getToken();
   document.getElementById('topSub').textContent='';
   if(!token){
@@ -162,7 +176,15 @@ function init(){
       </div>`;
     return;
   }
-  const data=loadStudentByToken(token);
+  // 显示加载中
+  document.getElementById('main').innerHTML=`
+    <div class="login-wrap">
+      <div class="icon">⏳</div>
+      <h2>正在加载...</h2>
+      <p>正在获取学情数据，请稍候</p>
+    </div>`;
+  
+  const data=await loadStudentByToken(token);
   if(!data){
     document.getElementById('main').innerHTML=`
       <div class="empty"><div class="ic">😕</div><div>链接无效或已过期</div><div style="font-size:12px;margin-top:8px;">请联系老师获取最新链接</div></div>`;
