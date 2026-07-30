@@ -1108,7 +1108,7 @@ function openShareLink(id){
     <div class="sheet-sub">${U.escape(s.name)} · ${U.escape(s.parentName)}</div>
     <div class="link-box">
       <div style="font-size:13px;color:var(--sub);margin-bottom:6px;">家长打开链接，输入密码查看：</div>
-      <div class="url">https://solo-feedback.vercel.app/view/${s.token}</div>
+      <div class="url">https://douououououou.github.io/solo-english-feedback/parent-view.html?token=${s.token}</div>
       <div style="margin-top:8px;font-size:13px;color:var(--sub);">密码：<strong style="color:var(--text);">${U.escape(s.password)}</strong></div>
     </div>
     <div style="font-size:12px;color:var(--sub);line-height:1.7;margin:8px 0;">
@@ -1126,7 +1126,7 @@ function openShareLink(id){
 }
 function copyLink(id){
   const s=getStudent(id);
-  const text=`${U.escape(s.name)}的学情反馈链接：\nhttps://solo-feedback.vercel.app/view/${s.token}\n查看密码：${s.password}`;
+  const text=`${U.escape(s.name)}的学情反馈链接：\nhttps://douououououou.github.io/solo-english-feedback/parent-view.html?token=${s.token}\n查看密码：${s.password}`;
   if(navigator.clipboard){
     navigator.clipboard.writeText(text).then(()=>U.toast('已复制')).catch(()=>fallbackCopy(text));
   }else{fallbackCopy(text);}
