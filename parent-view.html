@@ -121,13 +121,15 @@ const U={
 };
 
 function getToken(){
+  // 优先从 URL 参数读取
+  const params=new URLSearchParams(window.location.search);
+  const token=params.get('token')||'';
+  if(token)return token;
+  // 兼容 path 形式：/view/TOKEN
   const parts=window.location.pathname.split('/');
-  let token=parts[parts.length-1]||parts[parts.length-2];
-  if(!token||token==='view'){
-    const params=new URLSearchParams(window.location.search);
-    token=params.get('token')||'';
-  }
-  return token;
+  let t=parts[parts.length-1]||parts[parts.length-2];
+  if(t&&t!=='view'&&t!=='parent-view.html'&&!t.endsWith('.html'))return t;
+  return '';
 }
 
 // GitHub Pages 直接读取 data.json（不需要 API token）
