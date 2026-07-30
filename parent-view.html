@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#2D5BFF" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="学情反馈" />
+<title>学情反馈 · 家长端</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#F5F7FB;--card:#FFFFFF;--line:#E8ECF3;--text:#1B2230;--sub:#7A8497;
+    --primary:#2D5BFF;--primary-soft:#E7EDFF;--green:#1FB47A;--red:#E5484D;
+    --yellow:#FFB020;--shadow:0 2px 8px rgba(20,30,60,.06);
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+    padding-top:env(safe-area-inset-top);}
+  .app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--bg);
+    padding-bottom:calc(40px + env(safe-area-inset-bottom));position:relative;}
+  header.top{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
+    backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 14px;}
+  header.top h1{margin:0;font-size:18px;font-weight:600;text-align:center;}
+  header.top .sub{font-size:12px;color:var(--sub);text-align:center;margin-top:2px;}
+  main{padding:14px 14px 24px;}
+  .card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);
+    border:1px solid var(--line);margin-bottom:12px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;
+    padding:12px 14px;border-radius:10px;border:none;background:var(--primary);color:#fff;
+    font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s;width:100%;}
+  .btn:active{opacity:.75;}
+  .input{width:100%;padding:12px;border:1px solid var(--line);
+    border-radius:10px;background:#fff;font-size:16px;font-family:inherit;color:var(--text);
+    outline:none;transition:border .15s;text-align:center;letter-spacing:8px;}
+  .input:focus{border-color:var(--primary);}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:13px;color:var(--sub);margin-bottom:6px;text-align:center;}
+  .login-wrap{padding:40px 20px;text-align:center;}
+  .login-wrap .icon{font-size:48px;margin-bottom:12px;}
+  .login-wrap h2{margin:0 0 6px 0;font-size:20px;}
+  .login-wrap p{color:var(--sub);font-size:13px;margin:0 0 24px 0;}
+  .student-header{text-align:center;padding:20px 0 10px;}
+  .student-header .avatar{width:56px;height:56px;border-radius:50%;background:var(--primary-soft);
+    color:var(--primary);font-size:22px;font-weight:600;display:inline-flex;align-items:center;
+    justify-content:center;margin-bottom:8px;}
+  .student-header .name{font-size:18px;font-weight:600;}
+  .student-header .meta{font-size:12px;color:var(--sub);margin-top:2px;}
+  .stats-row{display:flex;gap:10px;margin-bottom:12px;}
+  .stats-row .stat{flex:1;padding:10px;border-radius:10px;background:var(--primary-soft);text-align:center;}
+  .stats-row .stat .lbl{font-size:11px;color:var(--sub);}
+  .stats-row .stat .val{font-size:18px;font-weight:600;color:var(--primary);}
+
+  /* Feedback table */
+  .fb-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .fb-table th,.fb-table td{padding:10px 6px;text-align:center;border-bottom:1px solid var(--line);}
+  .fb-table th{font-size:11px;color:var(--sub);font-weight:500;background:#F9FAFC;}
+  .fb-table tr:last-child td{border-bottom:none;}
+  .fb-table .good{color:var(--green);font-weight:600;}
+  .fb-table .warn{color:var(--yellow);font-weight:600;}
+  .fb-table .bad{color:var(--red);font-weight:600;}
+  .fb-table .na{color:var(--sub);}
+  .fb-table .date-col{text-align:left;min-width:70px;}
+  .fb-table .date-col .d{font-weight:500;}
+  .fb-table .date-col .w{font-size:11px;color:var(--sub);}
+
+  /* Detail card */
+  .detail-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;background:#fff;}
+  .detail-card .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+  .detail-card .date{font-size:13px;color:var(--sub);}
+  .detail-card .tone-tag{padding:2px 8px;border-radius:99px;font-size:11px;background:var(--primary-soft);color:var(--primary);}
+  .detail-card .content{font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap;}
+
+  /* Assessment report */
+  .assess-card{background:linear-gradient(135deg,#E7EDFF,#F3F6FF);border:1px solid var(--primary);border-radius:14px;padding:16px;margin-bottom:12px;}
+  .assess-card .assess-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+  .assess-card .assess-date{font-size:12px;color:var(--sub);margin-bottom:12px;}
+  .assess-overall{text-align:center;margin-bottom:14px;}
+  .assess-overall .grade{display:inline-block;padding:6px 24px;border-radius:12px;background:#fff;font-size:24px;font-weight:700;color:var(--primary);box-shadow:0 2px 8px rgba(45,91,255,.12);}
+  .assess-overall .grade-label{font-size:12px;color:var(--sub);margin-top:4px;}
+  .assess-scores{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  .assess-scores .si{background:#fff;border-radius:10px;padding:10px;text-align:center;}
+  .assess-scores .si .sl{font-size:12px;color:var(--sub);margin-bottom:2px;}
+  .assess-scores .si .sv{font-size:18px;font-weight:600;color:var(--primary);}
+  .assess-scores .si .sbar{height:4px;background:#EEF1F6;border-radius:2px;margin-top:6px;overflow:hidden;}
+  .assess-scores .si .sbar-fill{height:100%;background:var(--primary);border-radius:2px;}
+  .assess-analysis{background:#fff;border-radius:10px;padding:14px;font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text);}
+  .empty{padding:40px 20px;text-align:center;color:var(--sub);font-size:14px;}
+
+  .empty .ic{font-size:40px;margin-bottom:8px;opacity:.5;}
+  .teacher-footer{text-align:center;padding:16px;font-size:12px;color:var(--sub);}
+  .toast{position:fixed;left:50%;top:30%;transform:translateX(-50%);
+    background:rgba(20,25,40,.92);color:#fff;padding:10px 16px;border-radius:10px;
+    font-size:14px;z-index:200;opacity:0;transition:opacity .2s;pointer-events:none;}
+  .toast.show{opacity:1;}
+  .num{font-variant-numeric:tabular-nums;}
+  .muted{color:var(--sub);font-size:12px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>📚 学情反馈</h1>
+    <div class="sub" id="topSub"></div>
+  </header>
+  <main id="main"></main>
+  <div class="teacher-footer" id="teacherFooter"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const U={
+  fmtDate:s=>{if(!s)return'-';const d=new Date(s);return`${d.getMonth()+1}月${d.getDate()}日`;},
+  ymd:d=>{const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`;},
+  weekday:s=>{const d=new Date(s);return['日','一','二','三','四','五','六'][d.getDay()];},
+  toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1800);},
+  escape(s){return(s??'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+};
+
+function getToken(){
+  const parts=window.location.pathname.split('/');
+  let token=parts[parts.length-1]||parts[parts.length-2];
+  if(!token||token==='view'){
+    const params=new URLSearchParams(window.location.search);
+    token=params.get('token')||'';
+  }
+  return token;
+}
+
+function loadStudentByToken(token){
+  try{
+    const raw=localStorage.getItem('solo_feedback_v2');
+    if(!raw)return null;
+    const data=JSON.parse(raw);
+    const student=data.students.find(s=>s.token===token);
+    if(!student)return null;
+    const feedbacks=data.feedbacks.filter(f=>f.studentId===student.id)
+      .sort((a,b)=>b.date.localeCompare(a.date));
+    return {student,feedbacks,teacher:data.teacher};
+  }catch(e){return null;}
+}
+
+let session={student:null,feedbacks:[],teacher:null,unlocked:false};
+
+function init(){
+  const token=getToken();
+  document.getElementById('topSub').textContent='';
+  if(!token){
+    document.getElementById('main').innerHTML=`
+      <div class="login-wrap">
+        <div class="icon">🔗</div>
+        <h2>欢迎查看学情反馈</h2>
+        <p>请通过老师发送的专属链接打开</p>
+        <div class="field">
+          <label>或输入查看码</label>
+          <input class="input" id="manualToken" placeholder="如：a7f3k9x2" style="letter-spacing:2px;font-size:14px;"/>
+        </div>
+        <button class="btn" onclick="manualLogin()">查看</button>
+      </div>`;
+    return;
+  }
+  const data=loadStudentByToken(token);
+  if(!data){
+    document.getElementById('main').innerHTML=`
+      <div class="empty"><div class="ic">😕</div><div>链接无效或已过期</div><div style="font-size:12px;margin-top:8px;">请联系老师获取最新链接</div></div>`;
+    return;
+  }
+  session={...data,unlocked:false};
+  renderLogin();
+}
+
+function manualLogin(){
+  const t=document.getElementById('manualToken').value.trim();
+  if(!t){U.toast('请输入查看码');return;}
+  const base=window.location.origin+window.location.pathname;
+  window.location.href=`${base}?token=${t}`;
+}
+
+function renderLogin(){
+  const s=session.student;
+  document.getElementById('topSub').textContent=`${U.escape(s.name)} 的学情反馈`;
+  document.getElementById('main').innerHTML=`
+    <div class="login-wrap">
+      <div class="icon">🔒</div>
+      <h2>${U.escape(s.name)} 同学</h2>
+      <p>请输入查看密码</p>
+      <div class="field"><input class="input" id="pwdInput" type="password" maxlength="4" placeholder="4位密码" onkeydown="if(event.key==='Enter')doUnlock()"/></div>
+      <button class="btn" onclick="doUnlock()">查看反馈</button>
+    </div>`;
+  setTimeout(()=>document.getElementById('pwdInput').focus(),100);
+}
+
+function doUnlock(){
+  const pwd=document.getElementById('pwdInput').value.trim();
+  if(pwd!==session.student.password){U.toast('密码错误');return;}
+  session.unlocked=true;
+  renderFeedbacks();
+}
+
+function renderFeedbacks(){
+  const s=session.student;
+  const fbs=session.feedbacks;
+  const t=session.teacher||{};
+  document.getElementById('topSub').textContent=`${U.escape(s.name)} 的学情反馈`;
+  document.getElementById('teacherFooter').innerHTML=`${U.escape(t.name||'老师')} · ${U.escape(t.school||'')}<br/>如有疑问请直接联系老师`;
+
+  const firstInitial=s.name?s.name[0]:'?';
+  const total=fbs.length;
+  const goodCount=fbs.filter(f=>f.homeworkDone&&f.attentive&&f.participated).length;
+  const hasExam=fbs.some(f=>f.dictation||f.quiz||f.assessment);
+  const a=s.assessment;
+  const stages=s.stageAssessments||[];
+
+  const ASSESS_FIELDS=[
+    {key:'reading',label:'阅读',icon:'📖'},
+    {key:'listening',label:'听力',icon:'👂'},
+    {key:'speaking',label:'口语',icon:'🗣️'},
+    {key:'writing',label:'写作',icon:'✍️'},
+    {key:'vocabulary',label:'词汇',icon:'📚'},
+    {key:'grammar',label:'语法',icon:'🔤'},
+  ];
+
+  const renderAssessCard=(a,title,bgGradient)=>{
+    return `
+    <div class="assess-card" style="background:${bgGradient};">
+      <div class="assess-title">${title}</div>
+      <div class="assess-date">测评日期：${U.fmtDate(a.date)}</div>
+      <div class="assess-overall">
+        <div class="grade">${U.escape(a.overall||'-')}</div>
+        <div class="grade-label">综合等级</div>
+      </div>
+      <div class="assess-scores">
+        ${ASSESS_FIELDS.map(f=>{
+          const v=a[f.key]||0;
+          return `<div class="si">
+            <div class="sl">${f.icon} ${f.label}</div>
+            <div class="sv">${v}</div>
+            <div class="sbar"><div class="sbar-fill" style="width:${v}%;"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${a.analysis?`<div class="assess-analysis">${U.escape(a.analysis)}</div>`:''}
+    </div>`;
+  };
+
+  document.getElementById('main').innerHTML=`
+    <div class="student-header">
+      <div class="avatar">${U.escape(firstInitial)}</div>
+      <div class="name">${U.escape(s.name)}</div>
+      <div class="meta">${s.className?U.escape(s.className)+' · ':''}共 ${total} 条反馈 · ${goodCount} 次全优</div>
+    </div>
+
+    ${a?renderAssessCard(a,'📋 新生测评报告','linear-gradient(135deg,#E7EDFF,#F3F6FF)'):''}
+
+    ${stages.length>0?stages.map((st,i)=>renderAssessCard(st,`📊 阶段测评（第${i+1}次）`,'linear-gradient(135deg,#FFF4D6,#FFFBEF)')).join(''):''}
+
+    <div class="stats-row">
+      <div class="stat"><div class="lbl">本月反馈</div><div class="val num">${countThisMonth(fbs)}</div></div>
+      <div class="stat"><div class="lbl">作业完成率</div><div class="val num">${rate(fbs,'homeworkDone')}</div></div>
+      <div class="stat"><div class="lbl">认真听讲率</div><div class="val num">${rate(fbs,'attentive')}</div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:15px;margin:0 0 10px;"><span style="display:inline-block;width:6px;height:6px;background:var(--primary);border-radius:50%;margin-right:6px;"></span>课堂表现一览</h3>
+      ${fbs.length===0?'<div class="empty" style="padding:20px;">暂无反馈记录</div>':`
+      <div style="overflow-x:auto;">
+        <table class="fb-table">
+          <tr>
+            <th class="date-col">日期</th>
+            <th>作业</th>
+            <th>认真</th>
+            <th>互动</th>
+            ${hasExam?'<th>测评</th>':''}
+          </tr>
+          ${fbs.map(f=>{
+            const d=new Date(f.date);
+            const examParts=[];
+            if(f.dictation)examParts.push(`听写:${U.escape(f.dictation)}`);
+            if(f.quiz)examParts.push(`小测:${U.escape(f.quiz)}`);
+            if(f.assessment)examParts.push(`测评:${U.escape(f.assessment)}`);
+            return `<tr>
+              <td class="date-col"><div class="d">${d.getMonth()+1}/${d.getDate()}</div><div class="w">周${U.weekday(f.date)}</div></td>
+              <td class="${f.homeworkDone?'good':'bad'}">${f.homeworkDone?'✓':'✗'}</td>
+              <td class="${f.attentive?'good':'warn'}">${f.attentive?'✓':'!'}</td>
+              <td class="${f.participated?'good':'warn'}">${f.participated?'✓':'!'}</td>
+              ${hasExam?`<td style="font-size:11px;color:var(--sub);">${examParts.length>0?examParts.join('<br>'):'—'}</td>`:''}
+            </tr>`;
+          }).join('')}
+        </table>
+      </div>`}
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:15px;margin:0 0 10px;"><span style="display:inline-block;width:6px;height:6px;background:var(--primary);border-radius:50%;margin-right:6px;"></span>逐课详细反馈</h3>
+      ${fbs.length===0?'<div class="empty" style="padding:20px;">暂无详细反馈</div>':fbs.map(f=>`
+        <div class="detail-card">
+          <div class="header">
+            <div class="date">${U.fmtDate(f.date)} · 周${U.weekday(f.date)} · ${U.escape(f.lesson||'')}</div>
+          </div>
+          ${f.homeworkDetail?`<div style="font-size:13px;color:var(--green);margin:6px 0;font-weight:500;">📝 作业情况：${U.escape(f.homeworkDetail)}</div>`:''}
+          <div class="content">${U.escape(f.generated||'暂无详细内容')}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  window.scrollTo(0,0);
+}
+
+function countThisMonth(fbs){
+  const now=new Date();const m=now.getMonth(),y=now.getFullYear();
+  return fbs.filter(f=>{const d=new Date(f.date);return d.getMonth()===m&&d.getFullYear()===y;}).length;
+}
+function rate(fbs,key){
+  if(fbs.length===0)return'-';
+  const good=fbs.filter(f=>f[key]).length;
+  return Math.round(good/fbs.length*100)+'%';
+}
+
+init();
+</script>
+</body>
+</html>

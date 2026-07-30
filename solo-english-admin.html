@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#2D5BFF" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="教务" />
+<meta name="format-detection" content="telephone=no" />
+<!-- App 图标：蓝底白字"教" SVG -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='180'%20height='180'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='%232D5BFF'/%3E%3Ctext%20x='90'%20y='118'%20font-size='100'%20font-family='PingFang%20SC,Microsoft%20YaHei,sans-serif'%20font-weight='600'%20fill='white'%20text-anchor='middle'%3E%E6%95%99%3C/text%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='180'%20height='180'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='%232D5BFF'/%3E%3Ctext%20x='90'%20y='118'%20font-size='100'%20font-family='PingFang%20SC,Microsoft%20YaHei,sans-serif'%20font-weight='600'%20fill='white'%20text-anchor='middle'%3E%E6%95%99%3C/text%3E%3C/svg%3E" />
+<!-- 内联 PWA manifest -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"英语教务","short_name":"教务","start_url":".","display":"standalone","background_color":"%235F7FB","theme_color":"%232D5BFF","orientation":"portrait","icons":[{"src":"data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27512%27%20height=%27512%27%20viewBox=%270%200%20512%20512%27%3E%3Crect%20width=%27512%27%20height=%27512%27%20rx=%27110%27%20fill=%27%232D5BFF%27/%3E%3Ctext%20x=%27256%27%20y=%27340%27%20font-size=%27280%27%20font-family=%27PingFang%20SC,Microsoft%20YaHei,sans-serif%27%20font-weight=%27600%27%20fill=%27white%27%20text-anchor=%27middle%27%3E%E6%95%99%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}]}' />
+<title>英语教务 · Solo</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#F5F7FB;--card:#FFFFFF;--line:#E8ECF3;--text:#1B2230;--sub:#7A8497;
+    --primary:#2D5BFF;--primary-soft:#E7EDFF;--accent:#FF8A3D;--green:#1FB47A;--red:#E5484D;
+    --yellow:#FFB020;--shadow:0 2px 8px rgba(20,30,60,.06);
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+    /* iOS PWA 安全区适配 */
+    padding-top:env(safe-area-inset-top);
+    padding-left:env(safe-area-inset-left);
+    padding-right:env(safe-area-inset-right);}
+  .app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--bg);
+    padding-bottom:calc(84px + env(safe-area-inset-bottom));position:relative;}
+  header.top{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
+    padding-top:calc(14px + env(safe-area-inset-top));
+    backdrop-filter:saturate(180%) blur(10px);
+    border-bottom:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+  header.top h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.5px;}
+  header.top .sub{font-size:12px;color:var(--sub);}
+  main{padding:14px 14px 24px;}
+  .card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);
+    border:1px solid var(--line);margin-bottom:12px;}
+  .card h3{margin:0 0 10px 0;font-size:15px;display:flex;align-items:center;gap:6px;}
+  .card h3 .dot{width:6px;height:6px;background:var(--primary);border-radius:50%;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .stat{padding:12px;border-radius:12px;background:linear-gradient(135deg,#E7EDFF,#F3F6FF);}
+  .stat .lbl{font-size:12px;color:var(--sub);margin-bottom:4px;}
+  .stat .val{font-size:20px;font-weight:600;color:var(--text);}
+  .stat .unit{font-size:12px;color:var(--sub);font-weight:400;margin-left:2px;}
+  .stat.green{background:linear-gradient(135deg,#E2F8EE,#F1FBF6);}
+  .stat.orange{background:linear-gradient(135deg,#FFEEDE,#FFF6EE);}
+  .stat.yellow{background:linear-gradient(135deg,#FFF4D6,#FFFBEC);}
+  .stat.red{background:linear-gradient(135deg,#FFE5E7,#FFEEEE);}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .row + .row{margin-top:8px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;
+    padding:8px 14px;border-radius:10px;border:none;background:var(--primary);color:#fff;
+    font-size:14px;font-weight:500;cursor:pointer;transition:opacity .15s;}
+  .btn:active{opacity:.75;}
+  .btn.secondary{background:var(--primary-soft);color:var(--primary);}
+  .btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary);}
+  .btn.danger{background:var(--red);}
+  .btn.sm{padding:5px 10px;font-size:12px;border-radius:8px;}
+  .btn.block{width:100%;padding:12px;font-size:15px;}
+  .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:500;}
+  .tag.primary{background:var(--primary-soft);color:var(--primary);}
+  .tag.green{background:#E2F8EE;color:var(--green);}
+  .tag.red{background:#FFE5E7;color:var(--red);}
+  .tag.yellow{background:#FFF4D6;color:#B67800;}
+  .tag.gray{background:#EEF1F6;color:var(--sub);}
+  .list-item{padding:10px 0;border-bottom:1px solid var(--line);}
+  .list-item:last-child{border-bottom:none;}
+  .list-item .top-line{display:flex;justify-content:space-between;align-items:center;}
+  .list-item .name{font-weight:500;}
+  .list-item .meta{font-size:12px;color:var(--sub);margin-top:2px;}
+  .input, select, textarea{width:100%;padding:10px 12px;border:1px solid var(--line);
+    border-radius:10px;background:#fff;font-size:14px;font-family:inherit;color:var(--text);
+    outline:none;transition:border .15s;}
+  .input:focus,select:focus,textarea:focus{border-color:var(--primary);}
+  .field{margin-bottom:10px;}
+  .field label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px;}
+  .form-actions{display:flex;gap:8px;margin-top:14px;}
+  .form-actions .btn{flex:1;}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    display:flex;justify-content:space-around;align-items:center;padding:6px 0 max(6px,env(safe-area-inset-bottom));
+    z-index:60;max-width:520px;margin:0 auto;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+    padding:4px;color:var(--sub);font-size:11px;cursor:pointer;border:none;background:transparent;}
+  .tab .ico{width:22px;height:22px;display:inline-block;}
+  .tab.active{color:var(--primary);font-weight:600;}
+  .tab .ico svg{width:22px;height:22px;}
+  .empty{padding:30px 10px;text-align:center;color:var(--sub);font-size:13px;}
+  .empty .ic{font-size:32px;margin-bottom:6px;opacity:.5;}
+  .badge{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;
+    background:var(--red);color:#fff;border-radius:9px;font-size:11px;padding:0 5px;margin-left:4px;}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:99px;
+    background:var(--primary-soft);color:var(--primary);font-size:12px;}
+
+  /* Schedule */
+  .sched-week{display:grid;grid-template-columns:48px repeat(7,1fr);gap:2px;
+    background:var(--line);border-radius:10px;overflow:hidden;font-size:11px;}
+  .sched-week .hd{background:#fff;padding:6px 2px;text-align:center;font-weight:600;color:var(--sub);}
+  .sched-week .hd.today{color:var(--primary);}
+  .sched-week .hcell{background:#F9FAFC;padding:4px 2px;text-align:center;color:var(--sub);font-size:11px;}
+  .sched-week .cell{background:#fff;min-height:48px;padding:2px;position:relative;font-size:10px;}
+  .sched-week .slot{background:var(--primary-soft);border-left:3px solid var(--primary);
+    border-radius:4px;padding:2px 3px;color:var(--primary);font-size:10px;line-height:1.2;cursor:pointer;}
+  .sched-week .slot .nm{font-weight:600;display:block;}
+  .sched-week .slot .tm{opacity:.75;}
+
+  /* Drawer / Modal */
+  .mask{position:fixed;inset:0;background:rgba(15,20,40,.45);z-index:100;
+    display:none;align-items:flex-end;justify-content:center;}
+  .mask.show{display:flex;}
+  .sheet{background:#fff;width:100%;max-width:520px;border-radius:18px 18px 0 0;
+    padding:18px 16px 24px;max-height:88vh;overflow-y:auto;animation:slideUp .25s ease;}
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  .sheet h2{margin:0 0 4px 0;font-size:17px;}
+  .sheet .sheet-sub{color:var(--sub);font-size:12px;margin-bottom:14px;}
+  .sheet .grab{width:40px;height:4px;background:#D8DEEA;border-radius:2px;margin:-6px auto 12px;}
+
+  /* Switch */
+  .switch{position:relative;display:inline-block;width:42px;height:24px;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;cursor:pointer;inset:0;background:#D8DEEA;border-radius:24px;transition:.2s;}
+  .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+  .switch input:checked + .slider{background:var(--primary);}
+  .switch input:checked + .slider:before{transform:translateX(18px);}
+
+  /* Att chip */
+  .chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .chip{padding:6px 10px;border-radius:8px;background:#EEF1F6;color:var(--sub);
+    font-size:12px;cursor:pointer;border:1px solid transparent;}
+  .chip.on{background:var(--primary-soft);color:var(--primary);border-color:var(--primary);}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;top:30%;transform:translateX(-50%);
+    background:rgba(20,25,40,.92);color:#fff;padding:10px 16px;border-radius:10px;
+    font-size:14px;z-index:200;opacity:0;transition:opacity .2s;pointer-events:none;}
+  .toast.show{opacity:1;}
+
+  /* Tabs (within page) */
+  .tabs{display:flex;background:#EEF1F6;border-radius:10px;padding:3px;margin-bottom:12px;}
+  .tabs button{flex:1;padding:8px;border:none;background:transparent;border-radius:8px;
+    font-size:13px;color:var(--sub);cursor:pointer;font-weight:500;}
+  .tabs button.on{background:#fff;color:var(--primary);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+
+  .divider{height:1px;background:var(--line);margin:12px 0;}
+  .num{font-variant-numeric:tabular-nums;}
+  .warn-bg{background:#FFF4D6 !important;color:#B67800 !important;}
+  .danger-bg{background:#FFE5E7 !important;color:var(--red) !important;}
+
+  /* page switch */
+  .page{display:none;}
+  .page.active{display:block;}
+
+  .fab{position:fixed;right:18px;bottom:calc(96px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;
+    background:var(--primary);color:#fff;border:none;box-shadow:0 6px 16px rgba(45,91,255,.35);
+    font-size:26px;line-height:50px;text-align:center;cursor:pointer;z-index:40;
+    max-width:calc(520px - 36px);}
+
+  .seg{display:flex;gap:6px;}
+  .seg .btn{flex:1;padding:8px;}
+
+  .table{width:100%;border-collapse:collapse;font-size:13px;}
+  .table th,.table td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);}
+  .table th{font-size:12px;color:var(--sub);font-weight:500;}
+  .table tr:last-child td{border-bottom:none;}
+  .price-table th{background:#F4F6FB;}
+  .price-table .group-row td{background:#F0F4FF;font-weight:600;color:var(--primary);}
+
+  .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub);margin-top:6px;}
+  .legend span{display:inline-flex;align-items:center;gap:4px;}
+  .legend i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+
+  .qr-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);}
+  .qr-item:last-child{border-bottom:none;}
+  .qr-item .l{font-size:14px;}
+  .qr-item .r{text-align:right;font-size:12px;color:var(--sub);}
+
+  details{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;}
+  details summary{cursor:pointer;font-weight:500;list-style:none;display:flex;justify-content:space-between;align-items:center;}
+  details summary::-webkit-details-marker{display:none;}
+  details[open]{box-shadow:var(--shadow);}
+  details .body{padding-top:8px;}
+  .muted{color:var(--sub);font-size:12px;}
+
+  .balance-bar{height:6px;background:#EEF1F6;border-radius:3px;overflow:hidden;margin-top:4px;}
+  .balance-bar .fill{height:100%;background:var(--primary);transition:width .3s;}
+  .balance-bar .fill.low{background:var(--yellow);}
+  .balance-bar .fill.crit{background:var(--red);}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <h1 id="topTitle">教务</h1>
+      <div class="sub" id="topDate"></div>
+    </div>
+    <div class="sub" id="topRight"></div>
+  </header>
+
+  <main id="main"></main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-page="dashboard">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg></span>
+      首页
+    </button>
+    <button class="tab" data-page="schedule">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+      课表
+    </button>
+    <button class="tab" data-page="attendance">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
+      消课
+    </button>
+    <button class="tab" data-page="classes">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>
+      班级
+    </button>
+    <button class="tab" data-page="more">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></span>
+      更多
+    </button>
+  </nav>
+</div>
+
+<div class="mask" id="mask">
+  <div class="sheet" id="sheet">
+    <div class="grab"></div>
+    <div id="sheetContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============== Storage ============== */
+const LS_KEY = 'solo_english_admin_v1';
+const Store = {
+  data: null,
+  load(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(raw){ this.data = JSON.parse(raw); return; }
+    }catch(e){}
+    this.data = this.seed();
+    this.save();
+  },
+  save(){ localStorage.setItem(LS_KEY, JSON.stringify(this.data)); },
+  reset(){ this.data = this.seed(); this.save(); },
+  seed(){
+    const today = new Date();
+    const ymd = d => d.toISOString().slice(0,10);
+    const dPlus = (n)=>{ const d=new Date(today); d.setDate(d.getDate()+n); return ymd(d); };
+    return {
+      version:1,
+      settings:{ teacher:'Tina' },
+      packages:[
+        {id:'p1',name:'启蒙包',type:'启蒙45次',lessons:45,amount:22500,earlyBird:18000,note:'9单元·45次'},
+        {id:'p2',name:'Power Up 1学期包',type:'PowerUp1学期15次',lessons:15,amount:9000,earlyBird:7500,note:'3单元/15次'},
+        {id:'p3',name:'Power Up 2学期包',type:'PowerUp2学期15次',lessons:15,amount:9000,earlyBird:7500,note:'3单元/15次'},
+        {id:'p4',name:'Power Up 3学期包',type:'PowerUp3学期15次',lessons:15,amount:9000,earlyBird:7500,note:'3单元/15次'},
+        {id:'p5',name:'Power Up 4学期包',type:'PowerUp4学期15次',lessons:15,amount:9000,earlyBird:7500,note:'3单元/15次'},
+        {id:'p6',name:'KET 进阶',type:'KET进阶18',lessons:18,amount:11700,earlyBird:9900,note:'第一阶段'},
+        {id:'p7',name:'KET 强化',type:'KET强化18',lessons:18,amount:11700,earlyBird:9900,note:'第二阶段'},
+        {id:'p8',name:'KET 冲刺',type:'KET冲刺12',lessons:12,amount:7800,earlyBird:6600,note:'第三阶段'},
+        {id:'p9',name:'KET 全程包',type:'KET全程48',lessons:48,amount:31200,earlyBird:26400,note:'进阶+强化+冲刺'},
+      ],
+      students:[
+        {id:'s1',name:'林小明',parent:'林妈妈',phone:'138****1234',note:'KET准备中',joinDate:dPlus(-90)},
+        {id:'s2',name:'王语桐',parent:'王爸爸',phone:'139****5678',note:'',joinDate:dPlus(-60)},
+        {id:'s3',name:'张乐怡',parent:'张妈妈',phone:'136****9012',note:'启蒙阶段',joinDate:dPlus(-30)},
+        {id:'s4',name:'陈思源',parent:'陈妈妈',phone:'135****3456',note:'',joinDate:dPlus(-15)},
+      ],
+      classes:[
+        {id:'c1',name:'周三晚·启蒙A班',level:'启蒙',packageId:'p1',weekday:3,time:'19:00',duration:90,maxStudents:6,
+          startDate:dPlus(-30),
+          studentIds:['s3','s4'],status:'招生中',note:''},
+        {id:'c2',name:'周六上午·PowerUp1',level:'PowerUp1',packageId:'p2',weekday:6,time:'10:00',duration:120,maxStudents:6,
+          startDate:dPlus(-60),
+          studentIds:['s1','s2'],status:'招生中',note:''},
+        {id:'c3',name:'周日上午·KET进阶',level:'KET进阶',packageId:'p6',weekday:0,time:'09:30',duration:120,maxStudents:6,
+          startDate:dPlus(-14),
+          studentIds:['s1'],status:'招生中',note:''},
+      ],
+      enrollments:[
+        // studentId, packageId, totalLessons, remaining, used, enrolledAt
+        {id:'e1',studentId:'s1',packageId:'p2',totalLessons:15,remaining:12,used:3,enrolledAt:dPlus(-60)},
+        {id:'e2',studentId:'s2',packageId:'p2',totalLessons:15,remaining:8,used:7,enrolledAt:dPlus(-60)},
+        {id:'e3',studentId:'s3',packageId:'p1',totalLessons:45,remaining:40,used:5,enrolledAt:dPlus(-30)},
+        {id:'e4',studentId:'s4',packageId:'p1',totalLessons:45,remaining:42,used:3,enrolledAt:dPlus(-15)},
+      ],
+      // attendance: id, date, classId|studentId, attendance: 出席/请假/缺席, deduct:bool, makeUp:bool, note
+      attendances:[
+        {id:'a1',date:dPlus(-7),classId:'c2',studentId:'s1',attendance:'出席',deduct:true,makeUp:false},
+        {id:'a2',date:dPlus(-7),classId:'c2',studentId:'s2',attendance:'出席',deduct:true,makeUp:false},
+        {id:'a3',date:dPlus(-5),classId:'c1',studentId:'s3',attendance:'出席',deduct:true,makeUp:false},
+        {id:'a4',date:dPlus(-3),classId:'c2',studentId:'s1',attendance:'请假',deduct:false,makeUp:true,note:'感冒'},
+      ],
+      // payments: id, studentId, enrollmentId, packageName, totalAmount, paidAmount, installments, date, note
+      payments:[
+        {id:'pay1',studentId:'s1',enrollmentId:'e1',packageName:'Power Up 1学期包',totalAmount:9000,paidAmount:9000,installments:1,date:dPlus(-60),note:'全款'},
+        {id:'pay2',studentId:'s2',enrollmentId:'e2',packageName:'Power Up 1学期包',totalAmount:9000,paidAmount:4500,installments:2,date:dPlus(-60),note:'首期'},
+        {id:'pay3',studentId:'s3',enrollmentId:'e3',packageName:'启蒙包',totalAmount:22500,paidAmount:22500,installments:1,date:dPlus(-30),note:'全款'},
+        {id:'pay4',studentId:'s4',enrollmentId:'e4',packageName:'启蒙包',totalAmount:18000,paidAmount:9000,installments:2,date:dPlus(-15),note:'早鸟·首期'},
+      ],
+      schedules:[
+        // weekly recurring schedule derived from classes. but store overrides per-date as classOverrides
+        // classOverrides: [{date, classId, cancelled, customTime}]
+      ],
+    };
+  }
+};
+Store.load();
+
+const U = {
+  id:()=> Math.random().toString(36).slice(2,9),
+  fmtMoney:n=>'¥'+(n||0).toLocaleString('zh-CN'),
+  fmtDate:s=>{ if(!s) return '-'; const d=new Date(s); return `${d.getMonth()+1}月${d.getDate()}日`; },
+  ymd:d=>{ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; },
+  weekday:s=>{ const d=new Date(s); return ['日','一','二','三','四','五','六'][d.getDay()]; },
+  todayYmd(){ return U.ymd(new Date()); },
+  startOfWeek(d=new Date()){
+    const day=d.getDay(); const diff=d.getDate()-day;
+    const r=new Date(d); r.setDate(diff); r.setHours(0,0,0,0); return r;
+  },
+  addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; },
+  toast(msg){
+    const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+    clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800);
+  },
+  escape(s){ return (s??'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+};
+
+/* ============== Helpers ============== */
+const D = Store.data;
+const getStudent = id => D.students.find(s=>s.id===id);
+const getClass = id => D.classes.find(c=>c.id===id);
+const getPackage = id => D.packages.find(p=>p.id===id);
+const getEnrollment = id => D.enrollments.find(e=>e.id===id);
+const getStudentEnrollments = sid => D.enrollments.filter(e=>e.studentId===sid);
+const getStudentRemaining = sid => getStudentEnrollments(sid).reduce((a,e)=>a+e.remaining,0);
+const getStudentUsed = sid => getStudentEnrollments(sid).reduce((a,e)=>a+e.used,0);
+
+function detectConflict(weekday,time,duration,excludeClassId){
+  // 返回冲突的班级
+  return D.classes.find(c=>{
+    if(c.id===excludeClassId) return false;
+    if(c.weekday!==weekday) return false;
+    // overlap?
+    return timesOverlap(c.time,c.duration,time,duration);
+  });
+}
+function timesOverlap(t1,d1,t2,d2){
+  const a1=toMin(t1), a2=a1+d1;
+  const b1=toMin(t2), b2=b1+d2;
+  return a1<b2 && b1<a2;
+}
+function toMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+function fromMin(m){ const h=Math.floor(m/60),mm=m%60; return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; }
+
+function statusOfClass(c){
+  const cnt=c.studentIds.length;
+  if(cnt>=c.maxStudents) return {label:'满班',cls:'red'};
+  if(c.waitlist && c.waitlist.length>0) return {label:`候补${c.waitlist.length}`,cls:'yellow'};
+  if(cnt>=c.maxStudents-2) return {label:'快满',cls:'yellow'};
+  return {label:'招生中',cls:'green'};
+}
+
+/* ============== 班级排课计算（核心） ==============
+   根据班级的开课日期 + 每周固定(weekday) + 调课记录(overrides)
+   生成完整 N 节课的日期列表。N = 关联课程包的 lessons 数。
+   overrides 结构: {fromDate:'2026-08-05', toDate:'2026-08-07', note:'调课'}
+   表示把 8/5 这节调到 8/7。
+*/
+function getClassLessonCount(c){
+  if(c.packageId){
+    const p=getPackage(c.packageId);
+    if(p) return p.lessons;
+  }
+  return c.totalLessons||10; // 兜底
+}
+function getClassSchedule(c){
+  const total = getClassLessonCount(c);
+  const start = c.startDate ? new Date(c.startDate) : new Date();
+  start.setHours(0,0,0,0);
+  // 找到开课日期当天或之后第一个 weekday 匹配的日子作为第1节
+  // 如果开课日期本身就是 weekday，就用它
+  let firstDate = new Date(start);
+  // 向后找到第一个匹配 weekday 的日期
+  while(firstDate.getDay() !== c.weekday){
+    firstDate = U.addDays(firstDate,1);
+  }
+  // 生成 total 节课的基础日期（每周一节）
+  const lessons = [];
+  for(let i=0;i<total;i++){
+    const d = U.addDays(firstDate, i*7);
+    lessons.push({
+      idx: i+1,
+      originalDate: U.ymd(d),
+      date: U.ymd(d), // 可能被调课覆盖
+      time: c.time,
+      moved: false
+    });
+  }
+  // 应用调课 overrides
+  const moves = c.overrides||[];
+  moves.forEach(mv=>{
+    if(mv.fromDate && mv.toDate){
+      const lesson = lessons.find(l=>l.originalDate===mv.fromDate);
+      if(lesson){
+        lesson.date = mv.toDate;
+        lesson.time = mv.time || c.time;
+        lesson.moved = true;
+        lesson.note = mv.note||'';
+      } else {
+        // 如果原日期不在列表里（比如已经调过），尝试找 date 匹配的
+        const lesson2 = lessons.find(l=>l.date===mv.fromDate);
+        if(lesson2){
+          lesson2.date = mv.toDate;
+          lesson2.time = mv.time || c.time;
+          lesson2.moved = true;
+          lesson2.note = mv.note||'';
+        }
+      }
+    }
+  });
+  // 按实际日期排序
+  lessons.sort((a,b)=> a.date.localeCompare(b.date));
+  return lessons;
+}
+// 判断某日期是否有课（用于周课表/首页）
+function classHasLessonOnDate(c, ymd){
+  const lessons = getClassSchedule(c);
+  return lessons.some(l=>l.date===ymd);
+}
+
+/* ============== Pages ============== */
+const Pages = {};
+
+Pages.dashboard = function(){
+  const today = new Date();
+  const todayStr = U.todayYmd();
+  // 用新排课逻辑判断今天是否有课
+  const todays = D.classes.filter(c=>classHasLessonOnDate(c,todayStr));
+  // dashboard stats
+  const monthStart = new Date(today.getFullYear(),today.getMonth(),1);
+  const monthEnd = new Date(today.getFullYear(),today.getMonth()+1,1);
+  const monthAtt = D.attendances.filter(a=>{
+    const d=new Date(a.date);
+    return d>=monthStart && d<monthEnd && a.deduct;
+  });
+  const monthDeductCount = monthAtt.length;
+  const monthDropIn = D.attendances.filter(a=>{
+    const d=new Date(a.date);
+    return d>=monthStart && d<monthEnd && a.isDropIn && a.attendance==='出席';
+  });
+  const monthDropInCount = monthDropIn.length;
+  const monthDropInRevenue = monthDropIn.reduce((s,a)=>s+(a.amount||0),0);
+  const monthIncome = D.payments.filter(p=>{
+    const d=new Date(p.date); return d>=monthStart && d<monthEnd;
+  }).reduce((a,p)=>a+p.paidAmount,0);
+  // pending installments
+  const pending = D.payments.filter(p=>p.paidAmount<p.totalAmount)
+    .reduce((a,p)=>a+(p.totalAmount-p.paidAmount),0);
+  // low balance
+  const lowStudents = D.students.filter(s=>{
+    const r=getStudentRemaining(s.id); return r>0 && r<=3;
+  });
+  const noBalance = D.students.filter(s=>getStudentRemaining(s.id)===0);
+
+  let html = `
+  <div class="card">
+    <h3><span class="dot"></span>今日 · ${today.getMonth()+1}月${today.getDate()}日 · 周${U.weekday(todayStr)}</h3>
+    ${todays.length===0 ? '<div class="empty"><div class="ic">☕</div>今天没有课，可以休息一下</div>' : todays.map(c=>{
+      // 找到今天这节课的实际信息
+      const lessons = getClassSchedule(c);
+      const todayLesson = lessons.find(l=>l.date===todayStr);
+      const showTime = (todayLesson && todayLesson.time) ? todayLesson.time : c.time;
+      const movedTag = todayLesson && todayLesson.moved ? '<span class="tag yellow">已调</span>' : '';
+      return `
+      <div class="list-item">
+        <div class="top-line">
+          <div>
+            <div class="name">${U.escape(c.name)} ${movedTag}</div>
+            <div class="meta">${showTime} · ${c.duration}分钟 · ${c.level} · ${c.studentIds.length}${c.maxStudents?'/'+c.maxStudents:''}人</div>
+          </div>
+          <button class="btn sm" onclick="openQuickAttend('${c.id}','${todayStr}')">消课</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="grid2">
+    <div class="stat green">
+      <div class="lbl">本月收入</div>
+      <div class="val num">${U.fmtMoney(monthIncome)}</div>
+    </div>
+    <div class="stat orange">
+      <div class="lbl">待缴分期</div>
+      <div class="val num">${U.fmtMoney(pending)}</div>
+    </div>
+    <div class="stat yellow">
+      <div class="lbl">本月消课</div>
+      <div class="val num">${monthDeductCount}<span class="unit">次</span></div>
+      <div class="muted" style="font-size:11px;margin-top:2px;">体系课 ${monthDeductCount} · 散课 ${monthDropInCount}（${U.fmtMoney(monthDropInRevenue)}）</div>
+    </div>
+    <div class="stat">
+      <div class="lbl">在读学生</div>
+      <div class="val num">${D.students.length}<span class="unit">人</span></div>
+    </div>
+  </div>
+
+  ${(lowStudents.length+noBalance.length)>0 ? `
+  <div class="card" style="border-color:#FFB020;background:#FFFBEC;">
+    <h3><span class="dot" style="background:#FFB020"></span>续费提醒 <span class="tag yellow">${lowStudents.length+noBalance.length}</span></h3>
+    ${noBalance.map(s=>`
+      <div class="list-item">
+        <div class="top-line">
+          <div>
+            <div class="name">${U.escape(s.name)} <span class="tag red">已无课时</span></div>
+            <div class="meta">${U.escape(s.parent||'')} · ${U.escape(s.phone||'')}</div>
+          </div>
+          <button class="btn sm" onclick="quickEnroll('${s.id}')">续费</button>
+        </div>
+      </div>
+    `).join('')}
+    ${lowStudents.map(s=>{
+      const r=getStudentRemaining(s.id);
+      return `
+      <div class="list-item">
+        <div class="top-line">
+          <div>
+            <div class="name">${U.escape(s.name)} <span class="tag yellow">剩${r}节</span></div>
+            <div class="meta">${U.escape(s.parent||'')} · ${U.escape(s.phone||'')}</div>
+          </div>
+          <button class="btn sm" onclick="quickEnroll('${s.id}')">续费</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>` : ''}
+
+  <div class="card">
+    <h3><span class="dot"></span>班级速览</h3>
+    ${D.classes.map(c=>{
+      const st=statusOfClass(c);
+      return `
+      <div class="list-item">
+        <div class="top-line">
+          <div>
+            <div class="name">${U.escape(c.name)} <span class="tag ${st.cls}">${st.label}</span></div>
+            <div class="meta">周${U.weekday('2024-01-0'+(c.weekday+1))} · ${c.time} · ${c.level} · ${c.studentIds.length}${c.maxStudents?'/'+c.maxStudents:''}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+  return html;
+};
+
+Pages.schedule = function(){
+  const start = U.startOfWeek(new Date());
+  const days = Array.from({length:7},(_,i)=>U.addDays(start,i));
+
+  // 用新的排课逻辑：判断每天有哪些班级有课
+  function getClassesOnDate(date){
+    const ymd = U.ymd(date);
+    return D.classes.filter(c=>classHasLessonOnDate(c,ymd))
+      .map(c=>{
+        // 找到当天这节课的信息（可能被调课改过时间）
+        const lessons = getClassSchedule(c);
+        const lesson = lessons.find(l=>l.date===ymd);
+        return {...c, time: (lesson&&lesson.time)||c.time, moved: lesson&&lesson.moved};
+      })
+      .sort((a,b)=> toMin(a.time)-toMin(b.time));
+  }
+
+  const weekClasses = days.map(d=>({date:d, classes:getClassesOnDate(d)}));
+  const usedSlots = new Set();
+  weekClasses.forEach(({classes})=>{
+    classes.forEach(c=>{
+      const m = toMin(c.time);
+      const slot = Math.floor(m/60)*60;
+      usedSlots.add(slot);
+    });
+  });
+  const sortedSlots = [...usedSlots].sort((a,b)=>a-b);
+
+  let html = `
+  <div class="card">
+    <div class="row" style="margin-bottom:8px;">
+      <div><strong>本周课表</strong> <span class="muted">${U.fmtDate(U.ymd(start))} – ${U.fmtDate(U.ymd(U.addDays(start,6)))}</span></div>
+      <button class="btn sm" onclick="openAddClass()">+ 新建班级</button>
+    </div>
+    ${sortedSlots.length===0 ? '<div class="empty" style="padding:24px;">本周没有排课</div>' : `
+    <div class="sched-week" style="grid-template-columns:48px repeat(7,1fr);">
+      <div class="hd"></div>
+      ${days.map((d,i)=>{
+        const isToday = U.ymd(d)===U.todayYmd();
+        return `<div class="hd ${isToday?'today':''}">周${['日','一','二','三','四','五','六'][i]}<br>${d.getMonth()+1}/${d.getDate()}</div>`;
+      }).join('')}
+      ${sortedSlots.map(slot=>{
+        const slotLabel = fromMin(slot);
+        let row=`<div class="hcell">${slotLabel}</div>`;
+        for(let i=0;i<7;i++){
+          const dayClasses = weekClasses[i].classes.filter(c=>{
+            const m=toMin(c.time);
+            return m>=slot && m<slot+60;
+          });
+          row += `<div class="cell">${dayClasses.map(c=>{
+            const nm = c.name.length>6 ? c.name.slice(0,6)+'…' : c.name;
+            const movedTag = c.moved ? `<span style="color:var(--accent)">●</span>` : '';
+            return `<div class="slot" onclick="openClassSchedule('${c.id}')" title="${U.escape(c.name)}">
+              <span class="nm">${U.escape(nm)} ${movedTag}</span>
+              <span class="tm">${c.time}·${c.studentIds.length}${c.maxStudents?'/'+c.maxStudents:''}</span>
+            </div>`;
+          }).join('')||''}</div>`;
+        }
+        return row;
+      }).join('')}
+    </div>`}
+    <div class="legend">
+      <span><i style="background:#E7EDFF;border:1px solid #2D5BFF"></i>点击班级查看课表</span>
+      <span><i style="color:var(--accent)">●</i>已调课</span>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="dot"></span>全部班级</h3>
+    ${D.classes.map(c=>{
+      const st=statusOfClass(c);
+      const p = c.packageId?getPackage(c.packageId):null;
+      return `
+      <div class="list-item">
+        <div class="top-line">
+          <div>
+            <div class="name">${U.escape(c.name)} <span class="tag ${st.cls}">${st.label}</span></div>
+            <div class="meta">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time} · ${c.duration}分钟 · ${c.level}${p?` · ${p.lessons}次`:''}</div>
+            <div class="meta">学员：${c.studentIds.map(id=>{const s=getStudent(id); return s?U.escape(s.name):'?';}).join('、')||'<span class="muted">空</span>'}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <button class="btn sm secondary" onclick="openClassSchedule('${c.id}')">排课</button>
+            <button class="btn sm ghost" onclick="openEditClass('${c.id}')">编辑</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+  return html;
+};
+
+Pages.attendance = function(){
+  // list today's classes + recent attendances
+  const today = new Date();
+  const todayStr = U.todayYmd();
+  const todayClasses = D.classes.filter(c=>classHasLessonOnDate(c,todayStr));
+  const recent = [...D.attendances].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,30);
+
+  let html = `
+  <div class="card">
+    <div class="row" style="margin-bottom:8px;">
+      <div><strong>消课中心</strong> <span class="muted">一键扣课时 + 记出勤</span></div>
+    </div>
+    <div class="tabs" id="attTabs">
+      <button class="on" data-mode="today">今日</button>
+      <button data-mode="class">按班级</button>
+      <button data-mode="single">按学生</button>
+    </div>
+    <div id="attBody"></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="dot"></span>最近消课记录</h3>
+    ${recent.length===0?'<div class="empty">暂无记录</div>':recent.map(a=>{
+      const c=getClass(a.classId);
+      const s=getStudent(a.studentId);
+      return `<div class="list-item">
+        <div class="top-line">
+          <div>
+            <div class="name">${U.escape(s?s.name:'?')} · ${U.escape(c?c.name:'')}</div>
+            <div class="meta">${a.date} · ${a.attendance} ${a.deduct?'· 扣课':''} ${a.makeUp?'· 补课':''}</div>
+          </div>
+          <div>
+            ${a.deduct?'<span class="tag green">-1</span>':'<span class="tag gray">未扣</span>'}
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+  setTimeout(()=>{
+    const tabs=document.getElementById('attTabs');
+    const body=document.getElementById('attBody');
+    function render(mode){
+      [...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));
+      if(mode==='today'){
+        if(todayClasses.length===0){
+          body.innerHTML='<div class="empty">今天没有排课</div>';
+          return;
+        }
+        body.innerHTML = todayClasses.map(c=>`
+          <div class="list-item">
+            <div class="top-line">
+              <div>
+                <div class="name">${U.escape(c.name)}</div>
+                <div class="meta">${c.time} · ${c.studentIds.length}人</div>
+              </div>
+              <button class="btn sm" onclick="openQuickAttend('${c.id}','${todayStr}')">开始消课</button>
+            </div>
+          </div>`).join('');
+      } else if(mode==='class'){
+        body.innerHTML = `
+          <div class="field"><label>选择班级</label><select id="clsSel">${D.classes.map(c=>`<option value="${c.id}">${U.escape(c.name)}</option>`).join('')}</select></div>
+          <div class="field"><label>日期</label><input type="date" class="input" id="clsDate" value="${todayStr}"/></div>
+          <button class="btn block" onclick="quickByClass()">进入消课</button>
+        `;
+      } else {
+        body.innerHTML = `
+          <div class="field"><label>选择学生</label><select id="stuSel">${D.students.map(s=>`<option value="${s.id}">${U.escape(s.name)} (剩${getStudentRemaining(s.id)})</option>`).join('')}</select></div>
+          <div class="field"><label>日期</label><input type="date" class="input" id="stuDate" value="${todayStr}"/></div>
+          <button class="btn block" onclick="quickByStudent()">进入消课</button>
+        `;
+      }
+    }
+    render('today');
+    tabs.addEventListener('click',e=>{ if(e.target.tagName==='BUTTON') render(e.target.dataset.mode); });
+  },30);
+  return html;
+};
+
+Pages.classes = function(){
+  return `
+  <div class="card">
+    <div class="row" style="margin-bottom:8px;">
+      <div><strong>班级视图</strong></div>
+      <button class="btn sm" onclick="openAddClass()">+ 新建</button>
+    </div>
+    ${D.classes.map(c=>{
+      const st=statusOfClass(c);
+      const wl = c.waitlist||[];
+      const p = c.packageId?getPackage(c.packageId):null;
+      return `
+      <div class="card" style="margin-bottom:8px;box-shadow:none;border:1px solid var(--line);">
+        <div class="top-line" style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div class="name">${U.escape(c.name)} <span class="tag ${st.cls}">${st.label}</span></div>
+            <div class="meta">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time} · ${c.duration}分钟</div>
+            <div class="meta">${c.level} · ${c.studentIds.length}${c.maxStudents?'/'+c.maxStudents:''}人${p?` · ${p.lessons}次`:''}</div>
+          </div>
+          <button class="btn sm secondary" onclick="openEditClass('${c.id}')">编辑</button>
+        </div>
+        <div class="divider"></div>
+        <div class="muted" style="margin-bottom:4px;">学员（${c.studentIds.length}）</div>
+        ${c.studentIds.length===0?'<div class="empty" style="padding:10px;">暂无学员</div>':c.studentIds.map(sid=>{
+          const s=getStudent(sid);
+          const r=getStudentRemaining(sid);
+          const rcls = r===0?'danger-bg':(r<=3?'warn-bg':'');
+          return `<div class="list-item">
+            <div class="top-line">
+              <div>
+                <div class="name">${U.escape(s.name)}</div>
+                <div class="meta">${U.escape(s.parent||'')} ${U.escape(s.phone||'')}</div>
+              </div>
+              <span class="pill ${rcls}">剩 ${r}</span>
+            </div>
+          </div>`;
+        }).join('')}
+        <div class="muted" style="margin:8px 0 4px;display:flex;justify-content:space-between;align-items:center;">
+          <span>候补名单（${wl.length}）</span>
+          <button class="btn sm ghost" onclick="addWaitlist('${c.id}')">+ 添加候补</button>
+        </div>
+        ${wl.length===0?'<div class="empty" style="padding:6px;">—</div>':wl.map(sid=>{
+          const s=getStudent(sid); return `<div class="muted" style="padding:4px 0;">· ${U.escape(s.name)}</div>`;
+        }).join('')}
+        <div class="divider"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn sm secondary" onclick="openManageClassStudents('${c.id}')">管理学员</button>
+          <button class="btn sm ghost" onclick="openClassSchedule('${c.id}')">课表</button>
+          <button class="btn sm ghost" onclick="openQuickAttend('${c.id}','${U.todayYmd()}')">消课</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+};
+
+Pages.students = function(){
+  return `
+  <div class="card">
+    <div class="row" style="margin-bottom:8px;">
+      <div><strong>学生管理</strong> <span class="muted">${D.students.length}人</span></div>
+      <button class="btn sm" onclick="openAddStudent()">+ 新增学生</button>
+    </div>
+    ${D.students.map(s=>{
+      const r=getStudentRemaining(s.id);
+      const used=getStudentUsed(s.id);
+      const ens=getStudentEnrollments(s.id);
+      const rcls = r===0?'red':(r<=3?'yellow':'green');
+      const pct = ens.length===0?0:Math.min(100,Math.round(used/(used+r||1)*100));
+      return `<div class="list-item">
+        <div class="top-line">
+          <div style="flex:1;">
+            <div class="name">${U.escape(s.name)} <span class="tag ${rcls}">剩 ${r} 节</span></div>
+            <div class="meta">家长：${U.escape(s.parent||'-')} · ${U.escape(s.phone||'-')}</div>
+            <div class="meta">已消 ${used} · 报名 ${ens.length} 个包${s.note?' · '+U.escape(s.note):''}</div>
+            <div class="balance-bar"><div class="fill ${r===0?'crit':(r<=3?'low':'')}" style="width:${pct}%"></div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <button class="btn sm secondary" onclick="openEditStudent('${s.id}')">详情</button>
+            <button class="btn sm ghost" onclick="quickEnroll('${s.id}')">报名</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+};
+
+Pages.statistics = function(){
+  const today = new Date();
+  const ws = U.startOfWeek(today);
+  const we = U.addDays(ws,7);
+  const ms = new Date(today.getFullYear(),today.getMonth(),1);
+  const me = new Date(today.getFullYear(),today.getMonth()+1,1);
+  const weekAtt = D.attendances.filter(a=>{const d=new Date(a.date); return d>=ws && d<we && a.deduct;});
+  const monthAtt = D.attendances.filter(a=>{const d=new Date(a.date); return d>=ms && d<me && a.deduct;});
+  // by class this month
+  const byClass = {};
+  monthAtt.forEach(a=>{ byClass[a.classId]=(byClass[a.classId]||0)+1; });
+
+  // students remaining
+  const studentRows = D.students.map(s=>{
+    const r=getStudentRemaining(s.id);
+    return `<tr><td>${U.escape(s.name)}</td><td class="num">${r}</td><td class="num" style="color:${r<=3?'var(--red)':'inherit'}">${r<=3?'⚠':''}</td></tr>`;
+  }).join('');
+
+  return `
+  <div class="card">
+    <h3><span class="dot"></span>本周消课</h3>
+    <div class="grid2">
+      <div class="stat"><div class="lbl">本周消课总次数</div><div class="val num">${weekAtt.length}</div></div>
+      <div class="stat green"><div class="lbl">平均每天</div><div class="val num">${(weekAtt.length/7).toFixed(1)}</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="dot"></span>本月各班消课数</h3>
+    <table class="table">
+      <tr><th>班级</th><th>消课数</th></tr>
+      ${D.classes.map(c=>`<tr><td>${U.escape(c.name)}</td><td class="num">${byClass[c.id]||0}</td></tr>`).join('')}
+    </table>
+  </div>
+  <div class="card">
+    <h3><span class="dot"></span>学生剩余课时</h3>
+    <table class="table">
+      <tr><th>学生</th><th>剩余</th><th>提示</th></tr>
+      ${studentRows}
+    </table>
+  </div>
+  `;
+};
+
+Pages.income = function(){
+  const today = new Date();
+  const ms = new Date(today.getFullYear(),today.getMonth(),1);
+  const me = new Date(today.getFullYear(),today.getMonth()+1,1);
+  const monthIncome = D.payments.filter(p=>{const d=new Date(p.date); return d>=ms && d<me;}).reduce((a,p)=>a+p.paidAmount,0);
+  const totalIncome = D.payments.reduce((a,p)=>a+p.paidAmount,0);
+  const pending = D.payments.filter(p=>p.paidAmount<p.totalAmount);
+
+  // by student
+  const byStudent = {};
+  D.payments.forEach(p=>{ byStudent[p.studentId]=(byStudent[p.studentId]||0)+p.paidAmount; });
+  // by class (paid -> enrollment -> student -> classes)
+  const byClass = {};
+  D.payments.forEach(p=>{
+    const s=getStudent(p.studentId);
+    if(!s) return;
+    const cls = D.classes.filter(c=>c.studentIds.includes(s.id));
+    cls.forEach(c=>{ byClass[c.id]=(byClass[c.id]||0)+p.paidAmount/cls.length; });
+  });
+
+  return `
+  <div class="card">
+    <h3><span class="dot"></span>收入概览</h3>
+    <div class="grid2">
+      <div class="stat green"><div class="lbl">本月收入</div><div class="val num">${U.fmtMoney(monthIncome)}</div></div>
+      <div class="stat"><div class="lbl">累计收入</div><div class="val num">${U.fmtMoney(totalIncome)}</div></div>
+      <div class="stat orange"><div class="lbl">待缴分期</div><div class="val num">${U.fmtMoney(pending.reduce((a,p)=>a+(p.totalAmount-p.paidAmount),0))}</div></div>
+      <div class="stat yellow"><div class="lbl">缴费笔数</div><div class="val num">${D.payments.length}</div></div>
+    </div>
+  </div>
+  ${pending.length>0?`
+  <div class="card">
+    <h3><span class="dot"></span>待缴分期</h3>
+    ${pending.map(p=>{
+      const s=getStudent(p.studentId);
+      const left=p.totalAmount-p.paidAmount;
+      return `<div class="qr-item">
+        <div class="l">${U.escape(s.name)}<br><span class="muted">${U.escape(p.packageName)}</span></div>
+        <div class="r">${U.fmtMoney(left)}<br><span class="muted">已付 ${U.fmtMoney(p.paidAmount)} / ${U.fmtMoney(p.totalAmount)}</span>
+        <div style="margin-top:4px;"><button class="btn sm" onclick="recordPayment('${p.id}')">记一笔</button></div></div>
+      </div>`;
+    }).join('')}
+  </div>`:''}
+  <div class="card">
+    <h3><span class="dot"></span>按学生 · 累计缴费</h3>
+    <table class="table">
+      <tr><th>学生</th><th>累计</th></tr>
+      ${D.students.map(s=>`<tr><td>${U.escape(s.name)}</td><td class="num">${U.fmtMoney(byStudent[s.id]||0)}</td></tr>`).join('')}
+    </table>
+  </div>
+  <div class="card">
+    <h3><span class="dot"></span>按班级 · 累计缴费</h3>
+    <table class="table">
+      <tr><th>班级</th><th>累计</th></tr>
+      ${D.classes.map(c=>`<tr><td>${U.escape(c.name)}</td><td class="num">${U.fmtMoney(Math.round(byClass[c.id]||0))}</td></tr>`).join('')}
+    </table>
+  </div>
+  <div class="card">
+    <h3><span class="dot"></span>全部缴费记录</h3>
+    <button class="btn sm" style="margin-bottom:8px;" onclick="openAddPayment()">+ 新增缴费</button>
+    ${[...D.payments].sort((a,b)=>b.date.localeCompare(a.date)).map(p=>{
+      const s=getStudent(p.studentId);
+      return `<div class="qr-item">
+        <div class="l">${U.escape(s.name)}<br><span class="muted">${U.escape(p.packageName)}</span></div>
+        <div class="r">${U.fmtMoney(p.paidAmount)}<br><span class="muted">${p.date}${p.installments>1?` · ${p.installments}期`:''}</span></div>
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+};
+
+Pages.prices = function(){
+  // Show the full price list from the user image
+  // Build a table for the user's image
+  const rows = [
+    ['启蒙·包(45次)','45',22500,18000,36000,28800,54000,43200,'9单元·45次'],
+    ['Power Up·学期包','15',9000,7500,14400,12000,21600,18000,'3单元/15次'],
+    ['KET·进阶','18',11700,9900,18720,15840,28080,23760,'第一阶段'],
+    ['KET·强化','18',11700,9900,18720,15840,28080,23760,'第二阶段'],
+    ['KET·冲刺','12',7800,6600,12480,10560,18720,15840,'第三阶段'],
+    ['KET·全程包','48',31200,26400,49920,42240,74880,63360,'进阶+强化+冲刺'],
+  ];
+  return `
+  <div class="card">
+    <h3><span class="dot"></span>价格表</h3>
+    <div class="muted" style="margin-bottom:8px;">每生定价：小班基准 → 一对二 ×1.6 → 一对一 ×2.4（早鸟同理）</div>
+    <div style="overflow-x:auto;">
+    <table class="table price-table">
+      <tr><th>项目</th><th>次</th><th>小班·原</th><th>小班·早</th><th>1v2·原</th><th>1v2·早</th><th>1v1·原</th><th>1v1·早</th><th>备注</th></tr>
+      ${rows.map(r=>`<tr>
+        <td>${r[0]}</td><td>${r[1]}</td>
+        <td class="num">${U.fmtMoney(r[2])}</td>
+        <td class="num" style="color:#B67800">${U.fmtMoney(r[3])}</td>
+        <td class="num">${U.fmtMoney(r[4])}</td>
+        <td class="num" style="color:#B67800">${U.fmtMoney(r[5])}</td>
+        <td class="num">${U.fmtMoney(r[6])}</td>
+        <td class="num" style="color:#B67800">${U.fmtMoney(r[7])}</td>
+        <td>${r[8]}</td>
+      </tr>`).join('')}
+    </table>
+    </div>
+    <div class="divider"></div>
+    <div class="muted" style="margin-bottom:6px;">单次散课</div>
+    <table class="table">
+      <tr><th>类型</th><th>原</th><th>早鸟</th></tr>
+      <tr><td>启蒙·1.5h</td><td class="num">¥500</td><td class="num" style="color:#B67800">¥400</td></tr>
+      <tr><td>Power Up·2h</td><td class="num">¥600</td><td class="num" style="color:#B67800">¥500</td></tr>
+      <tr><td>KET·2h</td><td class="num">¥650</td><td class="num" style="color:#B67800">¥550</td></tr>
+    </table>
+    <div class="muted" style="margin-top:6px;">一对二倍 1.6 ｜ 一对一倍 2.4</div>
+  </div>
+
+  <div class="card">
+    <h3><span class="dot"></span>优惠策略</h3>
+    <ul style="padding-left:18px;margin:0;font-size:13px;line-height:1.9;">
+      <li><strong>创始/早鸟价</strong>：首期报名享早鸟价，限时限量。</li>
+      <li><strong>拼团开班</strong>：两名同水平 / 老带新拼班 → 双方享早鸟价。</li>
+      <li><strong>加值优先</strong>：多场 Speak Up / 入学测评 / 写作诊断。</li>
+      <li><strong>转介绍</strong>：新生读满首期后，介绍人得 5% 返现 或 8–10% 课程抵扣；被介绍新生得迎新礼。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3><span class="dot"></span>我的课程包</h3>
+    <button class="btn sm" style="margin-bottom:8px;" onclick="openAddPackage()">+ 新增课程包</button>
+    ${D.packages.map(p=>`<div class="list-item">
+      <div class="top-line">
+        <div>
+          <div class="name">${U.escape(p.name)} <span class="tag gray">${p.lessons}次</span></div>
+          <div class="meta">原 ${U.fmtMoney(p.amount)} · 早鸟 ${U.fmtMoney(p.earlyBird||0)} · ${U.escape(p.note||'')}</div>
+        </div>
+        <div style="display:flex;gap:4px;">
+          <button class="btn sm secondary" onclick="openEditPackage('${p.id}')">编辑</button>
+          <button class="btn sm danger" onclick="delPackage('${p.id}')">删</button>
+        </div>
+      </div>
+    </div>`).join('')}
+  </div>
+  `;
+};
+
+Pages.classSchedules = function(){
+  const todayStr = U.todayYmd();
+  return `
+  <div class="card">
+    <div class="row" style="margin-bottom:4px;">
+      <div><strong>班级课表</strong> <span class="muted">每班完整课次一览，可截图</span></div>
+    </div>
+    <div class="muted" style="font-size:12px;margin-bottom:10px;">调整课后自动更新。长按或截图分享给家长。</div>
+    ${D.classes.map(c=>{
+      const p = c.packageId?getPackage(c.packageId):null;
+      const lessons = getClassSchedule(c);
+      const st=statusOfClass(c);
+      return `
+      <div class="card" style="margin-bottom:14px;border:1px solid var(--line);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div>
+            <div style="font-size:16px;font-weight:600;">${U.escape(c.name)}</div>
+            <div class="meta">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time}-${fromMin(toMin(c.time)+(c.duration||0))} · ${c.level} · ${c.studentIds.length}人${p?` · 共${p.lessons}次`:''}</div>
+          </div>
+          <span class="tag ${st.cls}">${st.label}</span>
+        </div>
+        <div class="divider" style="margin:6px 0;"></div>
+        <table class="table" style="font-size:13px;">
+          <tr><th style="width:40px;">节次</th><th>日期</th><th>星期</th><th>时间</th><th style="width:40px;">状态</th></tr>
+          ${lessons.map(l=>{
+            const d=new Date(l.date);
+            const isToday = l.date===todayStr;
+            const isPast = l.date<todayStr;
+            const endMin = toMin(l.time) + (c.duration||0);
+            const timeRange = `${l.time}-${fromMin(endMin)}`;
+            return `<tr>
+              <td class="num">${l.idx}</td>
+              <td>${d.getMonth()+1}/${d.getDate()}</td>
+              <td>周${['日','一','二','三','四','五','六'][d.getDay()]}</td>
+              <td class="num">${timeRange}</td>
+              <td>${isToday?'<span class="tag green">今</span>':(l.moved?'<span class="tag yellow">调</span>':(isPast?'<span class="tag gray">已</span>':''))}</td>
+            </tr>`;
+          }).join('')}
+        </table>
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+};
+
+Pages.more = function(){
+  return `
+  <div class="card">
+    <h3><span class="dot"></span>工作台</h3>
+    <div class="grid2">
+      <button class="btn secondary" onclick="navigate('students')">学生</button>
+      <button class="btn secondary" onclick="navigate('classSchedules')">班级课表</button>
+      <button class="btn secondary" onclick="navigate('statistics')">课时统计</button>
+      <button class="btn secondary" onclick="navigate('income')">收入</button>
+      <button class="btn secondary" onclick="navigate('prices')">价格表</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="dot"></span>数据</h3>
+    <div class="row">
+      <div>本地存储</div>
+      <span class="tag green">${(JSON.stringify(D).length/1024).toFixed(1)} KB</span>
+    </div>
+    <div class="row" style="margin-top:8px;">
+      <button class="btn sm" onclick="exportData()">导出数据</button>
+      <button class="btn sm secondary" onclick="document.getElementById('importFile').click()">导入数据</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)"/>
+      <button class="btn sm danger" onclick="confirmReset()">重置示例</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="dot"></span>关于</h3>
+    <div class="muted">独立英语老师教务管理 · 离线可用 · 数据保存在本机浏览器</div>
+  </div>
+  `;
+};
+
+/* ============== Routing ============== */
+let currentPage = 'dashboard';
+function navigate(p, replace){
+  currentPage = p;
+  document.getElementById('main').innerHTML = Pages[p]();
+  [...document.querySelectorAll('.tab')].forEach(t=>t.classList.toggle('active',t.dataset.page===p || (p==='students'&&t.dataset.page==='more') || (p==='statistics'&&t.dataset.page==='more') || (p==='income'&&t.dataset.page==='more') || (p==='prices'&&t.dataset.page==='more') || (p==='classSchedules'&&t.dataset.page==='more')));
+  // update title
+  const titleMap={dashboard:'首页',schedule:'周课表',attendance:'消课',classes:'班级',students:'学生',statistics:'课时统计',income:'收入',prices:'价格表',classSchedules:'班级课表',more:'更多'};
+  document.getElementById('topTitle').textContent = titleMap[p]||'教务';
+  document.getElementById('topDate').textContent = '';
+  document.getElementById('topRight').textContent = '';
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>navigate(t.dataset.page));
+});
+
+/* ============== Sheet (modal) helpers ============== */
+function openSheet(html){
+  const mask=document.getElementById('mask');
+  document.getElementById('sheetContent').innerHTML=html;
+  mask.classList.add('show');
+}
+function closeSheet(){ document.getElementById('mask').classList.remove('show'); }
+document.getElementById('mask').addEventListener('click',e=>{
+  if(e.target.id==='mask') closeSheet();
+});
+
+/* ============== Class CRUD ============== */
+function openAddClass(){
+  openSheet(`
+    <h2>新建班级</h2>
+    <div class="sheet-sub">设置时间、课程包和开课日期</div>
+    <div class="field"><label>班级名称</label><input class="input" id="cName" placeholder="如：周三晚·启蒙A班"/></div>
+    <div class="grid2">
+      <div class="field"><label>级别</label>
+        <select class="input" id="cLevel">
+          <option>启蒙</option><option>PowerUp1</option><option>PowerUp2</option>
+          <option>PowerUp3</option><option>PowerUp4</option>
+          <option>KET进阶</option><option>KET强化</option><option>KET冲刺</option>
+          <option>Speak Up</option><option>口语</option><option>其他</option>
+        </select>
+      </div>
+      <div class="field"><label>最多人数</label><input class="input" id="cMax" type="number" value="6"/></div>
+    </div>
+    <div class="field"><label>关联课程包（决定总课次）</label>
+      <select class="input" id="cPkg">
+        <option value="">不关联</option>
+        ${D.packages.map(p=>`<option value="${p.id}">${U.escape(p.name)} (${p.lessons}次)</option>`).join('')}
+      </select>
+    </div>
+    <div class="grid3">
+      <div class="field"><label>星期</label>
+        <select class="input" id="cWd">
+          <option value="1">周一</option><option value="2">周二</option>
+          <option value="3">周三</option><option value="4">周四</option>
+          <option value="5">周五</option>
+          <option value="6">周六</option><option value="0">周日</option>
+        </select>
+      </div>
+      <div class="field"><label>开始时间</label><input class="input" id="cTime" type="time" value="19:00"/></div>
+      <div class="field"><label>时长(分)</label><input class="input" id="cDur" type="number" value="90"/></div>
+    </div>
+    <div class="field"><label>开课日期（第1节课的周）</label><input class="input" id="cStart" type="date" value="${U.todayYmd()}"/></div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="saveNewClass()">保存</button>
+    </div>
+  `);
+}
+function saveNewClass(){
+  const name=document.getElementById('cName').value.trim();
+  if(!name){U.toast('请输入班级名称');return;}
+  const weekday=+document.getElementById('cWd').value;
+  const time=document.getElementById('cTime').value;
+  const duration=+document.getElementById('cDur').value;
+  const level=document.getElementById('cLevel').value;
+  const maxStudents=+document.getElementById('cMax').value||6;
+  const packageId=document.getElementById('cPkg').value||'';
+  const startDate=document.getElementById('cStart').value||U.todayYmd();
+  const conflict = detectConflict(weekday,time,duration,null);
+  if(conflict){
+    if(!confirm(`与班级「${conflict.name}」时间冲突（周${['日','一','二','三','四','五','六'][conflict.weekday]} ${conflict.time}）仍要保存？`)) return;
+  }
+  const cls={id:U.id(),name,level,packageId,weekday,time,duration,maxStudents,startDate,studentIds:[],status:'招生中',note:''};
+  D.classes.push(cls);
+  Store.save(); closeSheet(); navigate('schedule'); U.toast('已创建');
+}
+function openEditClass(id){
+  const c=getClass(id); if(!c) return;
+  openSheet(`
+    <h2>编辑班级</h2>
+    <div class="field"><label>班级名称</label><input class="input" id="eName" value="${U.escape(c.name)}"/></div>
+    <div class="grid2">
+      <div class="field"><label>级别</label>
+        <select class="input" id="eLevel">
+          ${['启蒙','PowerUp1','PowerUp2','PowerUp3','PowerUp4','KET进阶','KET强化','KET冲刺','Speak Up','口语','其他'].map(l=>`<option ${c.level===l?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>最多人数</label><input class="input" id="eMax" type="number" value="${c.maxStudents}"/></div>
+    </div>
+    <div class="field"><label>关联课程包（决定总课次）</label>
+      <select class="input" id="ePkg">
+        <option value="">不关联</option>
+        ${D.packages.map(p=>`<option value="${p.id}" ${c.packageId===p.id?'selected':''}>${U.escape(p.name)} (${p.lessons}次)</option>`).join('')}
+      </select>
+    </div>
+    <div class="grid3">
+      <div class="field"><label>星期</label>
+        <select class="input" id="eWd">
+          ${[0,1,2,3,4,5,6].map(i=>`<option value="${i}" ${c.weekday===i?'selected':''}>${['日','一','二','三','四','五','六'][i]}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>开始时间</label><input class="input" id="eTime" type="time" value="${c.time}"/></div>
+      <div class="field"><label>时长(分)</label><input class="input" id="eDur" type="number" value="${c.duration}"/></div>
+    </div>
+    <div class="field"><label>开课日期</label><input class="input" id="eStart" type="date" value="${c.startDate||U.todayYmd()}"/></div>
+    <div class="form-actions">
+      <button class="btn danger" onclick="delClass('${id}')">删除</button>
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="saveEditClass('${id}')">保存</button>
+    </div>
+  `);
+}
+function saveEditClass(id){
+  const c=getClass(id);
+  c.name=document.getElementById('eName').value.trim()||c.name;
+  c.level=document.getElementById('eLevel').value;
+  c.maxStudents=+document.getElementById('eMax').value||c.maxStudents;
+  c.packageId=document.getElementById('ePkg').value||'';
+  c.weekday=+document.getElementById('eWd').value;
+  c.time=document.getElementById('eTime').value;
+  c.duration=+document.getElementById('eDur').value;
+  c.startDate=document.getElementById('eStart').value||U.todayYmd();
+  const conflict=detectConflict(c.weekday,c.time,c.duration,c.id);
+  if(conflict){
+    if(!confirm(`与「${conflict.name}」时间冲突，仍要保存？`)) return;
+  }
+  Store.save(); closeSheet(); navigate(currentPage); U.toast('已保存');
+}
+function delClass(id){
+  if(!confirm('删除该班级？学员关联会一并清除（不会删除学员本身）')) return;
+  D.classes = D.classes.filter(c=>c.id!==id);
+  Store.save(); closeSheet(); navigate(currentPage); U.toast('已删除');
+}
+
+/* ============== Class schedule detail (班级课表 + 调课) ============== */
+function openClassSchedule(cid){
+  renderClassScheduleSheet(cid);
+}
+function renderClassScheduleSheet(cid){
+  const c=getClass(cid); if(!c) return;
+  const p = c.packageId?getPackage(c.packageId):null;
+  const lessons = getClassSchedule(c);
+  const todayStr = U.todayYmd();
+
+  openSheet(`
+    <h2>${U.escape(c.name)}</h2>
+    <div class="sheet-sub">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time} · ${c.duration}分钟 · ${p?p.lessons+'次课':'未绑定课程包'} · ${c.studentIds.length}人</div>
+    <h3 style="font-size:14px;margin:0 0 8px;">全部课程（${lessons.length}节）</h3>
+    <div style="max-height:48vh;overflow-y:auto;">
+      ${lessons.map((l,i)=>{
+        const d=new Date(l.date);
+        const isToday = l.date===todayStr;
+        const isPast = l.date<todayStr;
+        const movedTag = l.moved?'<span class="tag yellow">已调</span>':'';
+        return `<div class="list-item">
+          <div class="top-line">
+            <div>
+              <div class="name">第${l.idx}节 · ${d.getMonth()+1}月${d.getDate()}日 · 周${['日','一','二','三','四','五','六'][d.getDay()]} ${isToday?'<span class="tag green">今天</span>':''} ${movedTag}</div>
+              <div class="meta">${l.time}${l.note?' · '+U.escape(l.note):''}${isPast?' · 已上':''}</div>
+            </div>
+            <div style="display:flex;gap:4px;">
+              <button class="btn sm ghost" onclick="openMoveLesson('${cid}','${l.originalDate}','${l.date}')">调课</button>
+              <button class="btn sm secondary" onclick="openQuickAttend('${cid}','${l.date}')">消课</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${(c.overrides||[]).length>0?`
+    <div class="divider"></div>
+    <h3 style="font-size:14px;margin:0 0 8px;">调课记录</h3>
+    ${(c.overrides||[]).map(o=>{
+      const fd=new Date(o.fromDate), td=new Date(o.toDate);
+      return `<div class="list-item">
+        <div class="top-line">
+          <div>
+            <div class="name">${fd.getMonth()+1}月${fd.getDate()}日 → ${td.getMonth()+1}月${td.getDate()}日</div>
+            <div class="meta">${o.note||''}</div>
+          </div>
+          <button class="btn sm danger" onclick="removeMove('${cid}','${o.fromDate}')">撤销</button>
+        </div>
+      </div>`;
+    }).join('')}
+    `:''}
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">关闭</button>
+      <button class="btn ghost" onclick="openEditClass('${cid}')">编辑班级</button>
+    </div>
+  `);
+}
+// 调课：把某节课从原日期调到新日期
+function openMoveLesson(cid, originalDate, currentDate){
+  const c=getClass(cid);
+  openSheet(`
+    <h2>调课</h2>
+    <div class="sheet-sub">${U.escape(c.name)} · 原日期 ${originalDate}${originalDate!==currentDate?`（当前 ${currentDate}）`:''}</div>
+    <div class="field"><label>调到哪一天</label><input class="input" id="mvToDate" type="date" value="${currentDate}"/></div>
+    <div class="field"><label>上课时间（可选，留空用默认）</label><input class="input" id="mvTime" type="time" value="${c.time}"/></div>
+    <div class="field"><label>备注（可选）</label><input class="input" id="mvNote" placeholder="如：学生请假补课、节假日顺延"/></div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet();renderClassScheduleSheet('${cid}')">取消</button>
+      <button class="btn" onclick="saveMoveLesson('${cid}','${originalDate}','${currentDate}')">确认调课</button>
+    </div>
+  `);
+}
+function saveMoveLesson(cid, originalDate, currentDate){
+  const c=getClass(cid);
+  const toDate = document.getElementById('mvToDate').value;
+  const time = document.getElementById('mvTime').value;
+  const note = document.getElementById('mvNote').value;
+  if(!toDate){U.toast('请选目标日期');return;}
+  if(toDate===currentDate){U.toast('日期相同，无需调课');return;}
+  c.overrides = c.overrides||[];
+  // 如果之前有基于 originalDate 的调课，先移除
+  c.overrides = c.overrides.filter(o=>o.fromDate!==originalDate);
+  c.overrides.push({fromDate:originalDate, toDate, time, note});
+  Store.save(); closeSheet();
+  renderClassScheduleSheet(cid);
+  U.toast('已调课');
+}
+function removeMove(cid, fromDate){
+  const c=getClass(cid);
+  c.overrides = (c.overrides||[]).filter(o=>o.fromDate!==fromDate);
+  Store.save(); closeSheet();
+  renderClassScheduleSheet(cid);
+  U.toast('已撤销调课');
+}
+
+/* ============== Student CRUD ============== */
+function openAddStudent(){
+  openSheet(`
+    <h2>新增学生</h2>
+    <div class="field"><label>姓名</label><input class="input" id="sName"/></div>
+    <div class="field"><label>家长姓名</label><input class="input" id="sParent"/></div>
+    <div class="field"><label>家长电话</label><input class="input" id="sPhone" type="tel"/></div>
+    <div class="field"><label>备注</label><textarea class="input" id="sNote" rows="2"></textarea></div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="saveNewStudent()">保存</button>
+    </div>
+  `);
+}
+function saveNewStudent(){
+  const name=document.getElementById('sName').value.trim();
+  if(!name){U.toast('请输入学生姓名');return;}
+  D.students.push({
+    id:U.id(),name,
+    parent:document.getElementById('sParent').value.trim(),
+    phone:document.getElementById('sPhone').value.trim(),
+    note:document.getElementById('sNote').value.trim(),
+    joinDate:U.todayYmd()
+  });
+  Store.save(); closeSheet(); navigate('students'); U.toast('已添加');
+}
+function openEditStudent(id){
+  const s=getStudent(id); if(!s) return;
+  const ens=getStudentEnrollments(id);
+  const pmt = D.payments.filter(p=>p.studentId===id);
+  openSheet(`
+    <h2>${U.escape(s.name)}</h2>
+    <div class="sheet-sub">剩余 ${getStudentRemaining(id)} 节 · 已消 ${getStudentUsed(id)} 节</div>
+    <div class="field"><label>姓名</label><input class="input" id="seName" value="${U.escape(s.name)}"/></div>
+    <div class="field"><label>家长姓名</label><input class="input" id="seParent" value="${U.escape(s.parent)}"/></div>
+    <div class="field"><label>家长电话</label><input class="input" id="sePhone" value="${U.escape(s.phone)}"/></div>
+    <div class="field"><label>备注</label><textarea class="input" id="seNote" rows="2">${U.escape(s.note)}</textarea></div>
+    <div class="divider"></div>
+    <h3 style="font-size:14px;margin:0 0 8px;">报名记录（${ens.length}）</h3>
+    ${ens.map(e=>{const p=getPackage(e.packageId); return `<div class="list-item">
+      <div class="top-line"><div><div class="name">${U.escape(p?p.name:e.packageId)}</div><div class="meta">剩余 ${e.remaining}/${e.totalLessons}</div></div></div>
+    </div>`;}).join('')||'<div class="muted">暂无报名</div>'}
+    <div class="divider"></div>
+    <h3 style="font-size:14px;margin:0 0 8px;">缴费记录（${pmt.length}）</h3>
+    ${pmt.map(p=>`<div class="muted" style="padding:4px 0;">${p.date} · ${U.escape(p.packageName)} · ${U.fmtMoney(p.paidAmount)} / ${U.fmtMoney(p.totalAmount)}</div>`).join('')||'<div class="muted">暂无</div>'}
+    <div class="form-actions">
+      <button class="btn danger" onclick="delStudent('${id}')">删除学生</button>
+      <button class="btn secondary" onclick="closeSheet()">关闭</button>
+      <button class="btn" onclick="saveEditStudent('${id}')">保存</button>
+    </div>
+  `);
+}
+function saveEditStudent(id){
+  const s=getStudent(id);
+  s.name=document.getElementById('seName').value.trim()||s.name;
+  s.parent=document.getElementById('seParent').value.trim();
+  s.phone=document.getElementById('sePhone').value.trim();
+  s.note=document.getElementById('seNote').value.trim();
+  Store.save(); closeSheet(); navigate(currentPage); U.toast('已保存');
+}
+function delStudent(id){
+  if(!confirm('删除该学生及其所有报名/缴费/消课记录？')) return;
+  D.students=D.students.filter(s=>s.id!==id);
+  D.enrollments=D.enrollments.filter(e=>e.studentId!==id);
+  D.payments=D.payments.filter(p=>p.studentId!==id);
+  D.attendances=D.attendances.filter(a=>a.studentId!==id);
+  D.classes.forEach(c=>{c.studentIds=c.studentIds.filter(x=>x!==id); if(c.waitlist) c.waitlist=c.waitlist.filter(x=>x!==id);});
+  Store.save(); closeSheet(); navigate('students'); U.toast('已删除');
+}
+
+/* ============== Manage students in a class ============== */
+function openManageClassStudents(cid){
+  const c=getClass(cid);
+  const all=D.students;
+  openSheet(`
+    <h2>管理学员 · ${U.escape(c.name)}</h2>
+    <div class="sheet-sub">勾选要加入班级的学员</div>
+    <div style="max-height:50vh;overflow-y:auto;">
+      ${all.map(s=>{
+        const inClass=c.studentIds.includes(s.id);
+        const r=getStudentRemaining(s.id);
+        const badge = c.isDropIn ? '<span class="tag primary">散课</span>' : `<span class="tag gray">剩${r}</span>`;
+        return `<div class="list-item">
+          <div class="top-line">
+            <div>
+              <div class="name">${U.escape(s.name)} ${badge}</div>
+              <div class="meta">${U.escape(s.parent||'')}</div>
+            </div>
+            <label class="switch"><input type="checkbox" data-sid="${s.id}" ${inClass?'checked':''} onchange="toggleClassStudent('${cid}','${s.id}',this.checked)"><span class="slider"></span></label>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="form-actions"><button class="btn block" onclick="closeSheet()">完成</button></div>
+  `);
+}
+function toggleClassStudent(cid,sid,on){
+  const c=getClass(cid);
+  if(on){
+    if(!c.studentIds.includes(sid)) c.studentIds.push(sid);
+    c.waitlist = (c.waitlist||[]).filter(x=>x!==sid);
+  } else {
+    c.studentIds = c.studentIds.filter(x=>x!==sid);
+  }
+  Store.save();
+}
+
+/* ============== Waitlist ============== */
+function addWaitlist(cid){
+  const c=getClass(cid);
+  const candidates = D.students.filter(s=>!c.studentIds.includes(s.id));
+  if(candidates.length===0){U.toast('所有学生都已在班');return;}
+  openSheet(`
+    <h2>添加候补</h2>
+    <div class="sheet-sub">${U.escape(c.name)}</div>
+    <div style="max-height:50vh;overflow-y:auto;">
+      ${candidates.map(s=>`<div class="list-item">
+        <div class="top-line">
+          <div><div class="name">${U.escape(s.name)}</div><div class="meta">${U.escape(s.parent||'')}</div></div>
+          <button class="btn sm" onclick="confirmWaitlist('${cid}','${s.id}')">加入</button>
+        </div>
+      </div>`).join('')}
+    </div>
+  `);
+}
+function confirmWaitlist(cid,sid){
+  const c=getClass(cid);
+  c.waitlist = c.waitlist||[];
+  if(!c.waitlist.includes(sid)) c.waitlist.push(sid);
+  Store.save(); closeSheet(); navigate(currentPage); U.toast('已加入候补');
+}
+
+/* ============== Quick attendance (per class) ============== */
+function openQuickAttend(cid,date){
+  const c=getClass(cid);
+  const students = c.studentIds.map(getStudent).filter(Boolean);
+  if(students.length===0){U.toast('班级暂无学员');return;}
+  // pre-fill existing records for this date
+  const existing = D.attendances.filter(a=>a.classId===cid && a.date===date);
+
+  // 散课班级：只记出勤 + 金额，不扣课时
+  if(c.isDropIn){
+    openSheet(`
+      <h2>散课消课 · ${U.escape(c.name)}</h2>
+      <div class="sheet-sub">${date} · ${U.escape(c.level)} · 每次 ${U.fmtMoney(c.dropInPrice||0)}（出席自动记一笔收入）</div>
+      <div id="attList">
+        ${students.map(s=>{
+          const ex=existing.find(a=>a.studentId===s.id);
+          const status = ex? ex.attendance : '出席';
+          const amt = ex? (ex.amount||c.dropInPrice||0) : (c.dropInPrice||0);
+          return `<div class="list-item">
+            <div class="top-line">
+              <div>
+                <div class="name">${U.escape(s.name)}</div>
+                <div class="meta">出勤状态：${status} · 金额 ¥<input type="number" style="width:70px;display:inline-block;padding:2px 4px;" class="input" data-sid="${s.id}" data-role="amt" value="${amt}"/></div>
+              </div>
+            </div>
+            <div class="chips" style="margin-top:6px;" data-sid="${s.id}">
+              <span class="chip ${status==='出席'?'on':''}" onclick="setDropStatus(this,'出席')">到</span>
+              <span class="chip ${status==='请假'?'on':''}" onclick="setDropStatus(this,'请假')">请假</span>
+              <span class="chip ${status==='缺席'?'on':''}" onclick="setDropStatus(this,'缺席')">缺席</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="form-actions">
+        <button class="btn secondary" onclick="closeSheet()">取消</button>
+        <button class="btn" onclick="commitDropInAttend('${cid}','${date}')">确认提交</button>
+      </div>
+    `);
+    return;
+  }
+
+  openSheet(`
+    <h2>消课 · ${U.escape(c.name)}</h2>
+    <div class="sheet-sub">${date} · 勾选本节扣课的学生，未勾选视为请假/缺席不扣</div>
+    <div class="field" style="display:flex;gap:6px;">
+      <button class="btn sm" onclick="setAllAttend(true)">整班到</button>
+      <button class="btn sm secondary" onclick="setAllAttend(false)">整班不到</button>
+    </div>
+    <div id="attList">
+      ${students.map(s=>{
+        const ex=existing.find(a=>a.studentId===s.id);
+        const r=getStudentRemaining(s.id);
+        const status = ex? ex.attendance : '出席';
+        const deduct = ex? ex.deduct : true;
+        return `<div class="list-item">
+          <div class="top-line">
+            <div>
+              <div class="name">${U.escape(s.name)} <span class="tag ${r<=3?'yellow':'gray'}">剩${r}</span></div>
+              <div class="meta">本节扣课：${deduct?'<b style="color:var(--green)">是</b>':'<b style="color:var(--sub)">否</b>'}</div>
+            </div>
+            <label class="switch"><input type="checkbox" data-sid="${s.id}" data-deduct="${deduct?1:0}" data-status="${status}" ${deduct?'checked':''} onchange="rowAttendChange(this,'${s.id}',${r})"><span class="slider"></span></label>
+          </div>
+          <div class="chips" style="margin-top:6px;">
+            <span class="chip ${status==='出席'?'on':''}" onclick="setAttStatus(this,'${s.id}','出席')">到</span>
+            <span class="chip ${status==='请假'?'on':''}" onclick="setAttStatus(this,'${s.id}','请假')">请假</span>
+            <span class="chip ${status==='缺席'?'on':''}" onclick="setAttStatus(this,'${s.id}','缺席')">缺席</span>
+            <span class="chip" onclick="setMakeUp('${s.id}')">标为补课</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="commitClassAttend('${cid}','${date}')">确认提交</button>
+    </div>
+  `);
+}
+function setDropStatus(el,status){
+  const wrap=el.parentElement;
+  [...wrap.children].forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  wrap.dataset.status=status;
+}
+function commitDropInAttend(cid,date){
+  const c=getClass(cid);
+  // 清除当天已有记录
+  const oldRecs = D.attendances.filter(a=>a.classId===cid && a.date===date);
+  const oldIds = new Set(oldRecs.map(a=>a.id));
+  D.attendances = D.attendances.filter(a=>!oldIds.has(a.id));
+  // 同时清除这些散课记录对应的缴费（按 note 标识）
+  D.payments = D.payments.filter(p=>!(p.enrollmentId==='' && p.date===date && p.note && p.note.indexOf(`散课·${c.name}`)===0 && oldRecs.some(a=>a.studentId===p.studentId)));
+
+  let attended=0, revenue=0;
+  document.querySelectorAll('#attList .chips').forEach(wrap=>{
+    const sid=wrap.dataset.sid;
+    const status = wrap.dataset.status || '出席';
+    const amtInput = document.querySelector(`#attList input[data-sid="${sid}"][data-role="amt"]`);
+    const amt = +(amtInput && amtInput.value) || 0;
+    D.attendances.push({id:U.id(),date,classId:cid,studentId:sid,attendance:status,deduct:false,makeUp:false,isDropIn:true,amount:amt});
+    if(status==='出席' && amt>0){
+      attended++; revenue+=amt;
+      // 自动生成一条缴费记录
+      D.payments.push({id:U.id(),studentId:sid,enrollmentId:'',packageName:`散课·${c.level}`,totalAmount:amt,paidAmount:amt,installments:1,date,note:`散课·${c.name}`});
+    }
+  });
+  Store.save(); closeSheet();
+  U.toast(`散课已记录：出席 ${attended} 人，收入 ${U.fmtMoney(revenue)}`);
+  navigate(currentPage);
+}
+function setAllAttend(flag){
+  document.querySelectorAll('#attList input[type=checkbox]').forEach(cb=>{
+    cb.checked=flag; cb.dataset.deduct=flag?1:0;
+  });
+}
+function rowAttendChange(cb,sid,remain){
+  cb.dataset.deduct = cb.checked?1:0;
+}
+function setAttStatus(el,sid,status){
+  const wrap=el.parentElement;
+  [...wrap.children].forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  const card=wrap.parentElement;
+  const toggle=card.querySelector('input[type=checkbox]');
+  toggle.dataset.status=status;
+  // 请假时默认不扣课（除非用户手动开启）
+  if(status==='请假'){
+    toggle.checked=false; toggle.dataset.deduct=0;
+    const meta = card.querySelector('.meta');
+    meta.innerHTML='本节扣课：<b style="color:var(--sub)">否</b>（请假）';
+  } else if(status==='出席'){
+    toggle.checked=true; toggle.dataset.deduct=1;
+    const meta = card.querySelector('.meta');
+    meta.innerHTML='本节扣课：<b style="color:var(--green)">是</b>';
+  } else if(status==='缺席'){
+    // 缺席按老师习惯通常不扣课（学生没来）
+    toggle.checked=false; toggle.dataset.deduct=0;
+    const meta = card.querySelector('.meta');
+    meta.innerHTML='本节扣课：<b style="color:var(--sub)">否</b>（缺席）';
+  }
+}
+function setMakeUp(sid){
+  // mark this student in this class as make-up (visual only, hint applied at commit)
+  const card=event.target.closest('.list-item');
+  event.target.classList.toggle('on');
+  const t=card.querySelector('input[type=checkbox]');
+  t.dataset.makeup = event.target.classList.contains('on')?1:0;
+}
+function commitClassAttend(cid,date){
+  const c=getClass(cid);
+  const inputs=[...document.querySelectorAll('#attList input[type=checkbox]')];
+  // remove existing records for this class+date
+  D.attendances = D.attendances.filter(a=>!(a.classId===cid && a.date===date));
+  let deducted=0, madeUp=0;
+  inputs.forEach(cb=>{
+    const sid=cb.dataset.sid;
+    const deduct = cb.dataset.deduct==='1';
+    const status = cb.dataset.status || (deduct?'出席':'请假');
+    const makeUp = cb.dataset.makeup==='1';
+    D.attendances.push({id:U.id(),date,classId:cid,studentId:sid,attendance:status,deduct,makeUp});
+    if(deduct){
+      // decrement student remaining (FIFO across enrollments)
+      const ens=getStudentEnrollments(sid);
+      let need=1;
+      for(const e of ens){
+        if(need<=0) break;
+        const take=Math.min(e.remaining,need);
+        e.remaining-=take; e.used+=take; need-=take;
+        deducted++;
+      }
+    }
+    if(makeUp) madeUp++;
+  });
+  Store.save(); closeSheet();
+  U.toast(`已提交：扣课 ${deducted} 人${madeUp?`，补课 ${madeUp} 人`:''}`);
+  navigate(currentPage);
+}
+function quickByClass(){
+  const cid=document.getElementById('clsSel').value;
+  const date=document.getElementById('clsDate').value;
+  closeSheet();
+  setTimeout(()=>openQuickAttend(cid,date),200);
+}
+function quickByStudent(){
+  const sid=document.getElementById('stuSel').value;
+  const date=document.getElementById('stuDate').value;
+  const s=getStudent(sid);
+  openSheet(`
+    <h2>消课 · ${U.escape(s.name)}</h2>
+    <div class="sheet-sub">${date} · 剩余 ${getStudentRemaining(sid)} 节</div>
+    <div class="field"><label>选择班级（可选）</label>
+      <select class="input" id="sglCls">
+        <option value="">个人课/不指定</option>
+        ${D.classes.filter(c=>c.studentIds.includes(sid)).map(c=>`<option value="${c.id}">${U.escape(c.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>出勤</label>
+      <div class="chips">
+        <span class="chip on" data-st="出席">到</span>
+        <span class="chip" data-st="请假">请假</span>
+        <span class="chip" data-st="缺席">缺席</span>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px;">
+      <div>本节扣课</div>
+      <label class="switch"><input type="checkbox" id="sglDeduct" checked><span class="slider"></span></label>
+    </div>
+    <div class="row">
+      <div>补课</div>
+      <label class="switch"><input type="checkbox" id="sglMakeUp"><span class="slider"></span></label>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="commitSingleAttend('${sid}','${date}')">提交</button>
+    </div>
+  `);
+  document.querySelectorAll('.chip[data-st]').forEach(c=>c.addEventListener('click',e=>{
+    [...c.parentElement.children].forEach(x=>x.classList.remove('on'));
+    c.classList.add('on');
+    const st=c.dataset.st;
+    document.getElementById('sglDeduct').checked = (st==='出席');
+  }));
+}
+function commitSingleAttend(sid,date){
+  const cls=document.getElementById('sglCls').value;
+  const deduct=document.getElementById('sglDeduct').checked;
+  const makeUp=document.getElementById('sglMakeUp').checked;
+  const status=document.querySelector('.chip.on[data-st]').dataset.st;
+  D.attendances.push({id:U.id(),date,classId:cls,studentId:sid,attendance:status,deduct,makeUp});
+  if(deduct){
+    const ens=getStudentEnrollments(sid); let need=1;
+    for(const e of ens){
+      if(need<=0) break;
+      const take=Math.min(e.remaining,need);
+      e.remaining-=take; e.used+=take; need-=take;
+    }
+  }
+  Store.save(); closeSheet(); navigate(currentPage); U.toast('已记录');
+}
+
+/* ============== Enrollment / 续费 ============== */
+function quickEnroll(sid){
+  const s=getStudent(sid);
+  openSheet(`
+    <h2>报名 · ${U.escape(s.name)}</h2>
+    <div class="sheet-sub">为该学生报名一个课程包，自动加课时</div>
+    <div class="field"><label>选择课程包</label>
+      <select class="input" id="enPkg">
+        ${D.packages.map(p=>`<option value="${p.id}">${U.escape(p.name)} · ${p.lessons}次 · ${U.fmtMoney(p.amount)}（早鸟${U.fmtMoney(p.earlyBird||0)}）</option>`).join('')}
+      </select>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>报名日期</label><input class="input" id="enDate" type="date" value="${U.todayYmd()}"/></div>
+      <div class="field"><label>本次实收</label><input class="input" id="enPaid" type="number" value="0"/></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>总金额</label><input class="input" id="enTotal" type="number" value="0"/></div>
+      <div class="field"><label>分期数</label><input class="input" id="enInst" type="number" value="1" min="1"/></div>
+    </div>
+    <div class="field"><label>备注</label><input class="input" id="enNote"/></div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="commitEnroll('${sid}')">确认报名</button>
+    </div>
+  `);
+  // auto-fill total based on package
+  function autofill(){
+    const pid=document.getElementById('enPkg').value;
+    const p=getPackage(pid);
+    if(p){
+      document.getElementById('enTotal').value = p.amount;
+      document.getElementById('enPaid').value = p.earlyBird||p.amount;
+    }
+  }
+  document.getElementById('enPkg').addEventListener('change',autofill);
+  autofill();
+}
+function commitEnroll(sid){
+  const pid=document.getElementById('enPkg').value;
+  const p=getPackage(pid);
+  const date=document.getElementById('enDate').value;
+  const total=+document.getElementById('enTotal').value||p.amount;
+  const paid=+document.getElementById('enPaid').value;
+  const inst=+document.getElementById('enInst').value||1;
+  const note=document.getElementById('enNote').value;
+  const eid=U.id();
+  D.enrollments.push({id:eid,studentId:sid,packageId:pid,totalLessons:p.lessons,remaining:p.lessons,used:0,enrolledAt:date});
+  D.payments.push({id:U.id(),studentId:sid,enrollmentId:eid,packageName:p.name,totalAmount:total,paidAmount:paid,installments:inst,date,note});
+  Store.save(); closeSheet(); navigate('students'); U.toast('已报名并加课时');
+}
+
+/* ============== Payment ============== */
+function openAddPayment(){
+  openSheet(`
+    <h2>新增缴费</h2>
+    <div class="field"><label>学生</label>
+      <select class="input" id="payStu">${D.students.map(s=>`<option value="${s.id}">${U.escape(s.name)}</option>`).join('')}</select>
+    </div>
+    <div class="field"><label>所报包</label><input class="input" id="payPkg" placeholder="如：Power Up 1学期包"/></div>
+    <div class="grid2">
+      <div class="field"><label>总金额</label><input class="input" id="payTotal" type="number"/></div>
+      <div class="field"><label>本次实收</label><input class="input" id="payPaid" type="number"/></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>日期</label><input class="input" id="payDate" type="date" value="${U.todayYmd()}"/></div>
+      <div class="field"><label>分期数</label><input class="input" id="payInst" type="number" value="1" min="1"/></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="commitPayment()">保存</button>
+    </div>
+  `);
+}
+function commitPayment(){
+  const sid=document.getElementById('payStu').value;
+  const pkgName=document.getElementById('payPkg').value||'自由缴费';
+  const total=+document.getElementById('payTotal').value||0;
+  const paid=+document.getElementById('payPaid').value||0;
+  const date=document.getElementById('payDate').value;
+  const inst=+document.getElementById('payInst').value||1;
+  D.payments.push({id:U.id(),studentId:sid,enrollmentId:'',packageName:pkgName,totalAmount:total,paidAmount:paid,installments:inst,date});
+  Store.save(); closeSheet(); navigate('income'); U.toast('已记录');
+}
+function recordPayment(pid){
+  const p=D.payments.find(x=>x.id===pid);
+  openSheet(`
+    <h2>记录缴费</h2>
+    <div class="sheet-sub">${U.escape(p.packageName)} · 已付 ${U.fmtMoney(p.paidAmount)} / ${U.fmtMoney(p.totalAmount)}</div>
+    <div class="field"><label>本次金额</label><input class="input" id="rpAmt" type="number" value="${p.totalAmount-p.paidAmount}"/></div>
+    <div class="field"><label>日期</label><input class="input" id="rpDate" type="date" value="${U.todayYmd()}"/></div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="doRecordPayment('${pid}')">确认</button>
+    </div>
+  `);
+}
+function doRecordPayment(pid){
+  const p=D.payments.find(x=>x.id===pid);
+  const amt=+document.getElementById('rpAmt').value;
+  const date=document.getElementById('rpDate').value;
+  p.paidAmount=Math.min(p.totalAmount,p.paidAmount+amt);
+  D.payments.push({id:U.id(),studentId:p.studentId,enrollmentId:p.enrollmentId,packageName:p.packageName+'（续缴）',totalAmount:amt,paidAmount:amt,installments:1,date});
+  Store.save(); closeSheet(); navigate('income'); U.toast('已记录');
+}
+
+/* ============== Package CRUD ============== */
+function openAddPackage(){
+  openSheet(`
+    <h2>新增课程包</h2>
+    <div class="field"><label>包名</label><input class="input" id="apName"/></div>
+    <div class="field"><label>类型</label>
+      <select class="input" id="apType">
+        <option>启蒙45次</option><option>PowerUp1学期15次</option><option>PowerUp2学期15次</option>
+        <option>PowerUp3学期15次</option><option>PowerUp4学期15次</option>
+        <option>KET进阶18</option><option>KET强化18</option><option>KET冲刺12</option>
+      </select>
+    </div>
+    <div class="grid3">
+      <div class="field"><label>总课时</label><input class="input" id="apLes" type="number" value="15"/></div>
+      <div class="field"><label>原价</label><input class="input" id="apAmt" type="number"/></div>
+      <div class="field"><label>早鸟价</label><input class="input" id="apEB" type="number"/></div>
+    </div>
+    <div class="field"><label>备注</label><input class="input" id="apNote"/></div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="savePackage()">保存</button>
+    </div>
+  `);
+}
+function savePackage(){
+  D.packages.push({
+    id:U.id(),
+    name:document.getElementById('apName').value,
+    type:document.getElementById('apType').value,
+    lessons:+document.getElementById('apLes').value,
+    amount:+document.getElementById('apAmt').value,
+    earlyBird:+document.getElementById('apEB').value,
+    note:document.getElementById('apNote').value
+  });
+  Store.save(); closeSheet(); navigate('prices'); U.toast('已添加');
+}
+function openEditPackage(id){
+  const p=getPackage(id);
+  openSheet(`
+    <h2>编辑课程包</h2>
+    <div class="field"><label>包名</label><input class="input" id="epName" value="${U.escape(p.name)}"/></div>
+    <div class="field"><label>类型</label><input class="input" id="epType" value="${U.escape(p.type)}"/></div>
+    <div class="grid3">
+      <div class="field"><label>总课时</label><input class="input" id="epLes" type="number" value="${p.lessons}"/></div>
+      <div class="field"><label>原价</label><input class="input" id="epAmt" type="number" value="${p.amount}"/></div>
+      <div class="field"><label>早鸟价</label><input class="input" id="epEB" type="number" value="${p.earlyBird||0}"/></div>
+    </div>
+    <div class="field"><label>备注</label><input class="input" id="epNote" value="${U.escape(p.note||'')}"/></div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeSheet()">取消</button>
+      <button class="btn" onclick="updatePackage('${id}')">保存</button>
+    </div>
+  `);
+}
+function updatePackage(id){
+  const p=getPackage(id);
+  p.name=document.getElementById('epName').value;
+  p.type=document.getElementById('epType').value;
+  p.lessons=+document.getElementById('epLes').value;
+  p.amount=+document.getElementById('epAmt').value;
+  p.earlyBird=+document.getElementById('epEB').value;
+  p.note=document.getElementById('epNote').value;
+  Store.save(); closeSheet(); navigate('prices'); U.toast('已保存');
+}
+function delPackage(id){
+  if(!confirm('删除该课程包？已有报名不受影响')) return;
+  D.packages=D.packages.filter(p=>p.id!==id);
+  Store.save(); navigate('prices'); U.toast('已删除');
+}
+
+/* ============== Data export/import ============== */
+function exportData(){
+  const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`教务数据_${U.todayYmd()}.json`;
+  a.click();
+}
+function importData(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const obj=JSON.parse(r.result);
+      if(!obj.students||!obj.classes) throw new Error('格式错误');
+      if(!confirm('导入将覆盖当前所有数据，确定？')) return;
+      D.students=obj.students; D.classes=obj.classes; D.enrollments=obj.enrollments||[];
+      D.attendances=obj.attendances||[]; D.payments=obj.payments||[]; D.packages=obj.packages||[];
+      D.schedules=obj.schedules||[]; D.settings=obj.settings||{teacher:'Tina'};
+      Store.save(); navigate('dashboard'); U.toast('已导入');
+    }catch(err){U.toast('导入失败：'+err.message);}
+  };
+  r.readAsText(f);
+}
+function confirmReset(){
+  if(!confirm('重置为初始示例数据？当前数据将丢失')) return;
+  Store.reset(); navigate('dashboard'); U.toast('已重置');
+}
+
+/* ============== Init ============== */
+document.getElementById('topDate').textContent = (()=>{
+  const t=new Date();
+  return `${t.getFullYear()}/${t.getMonth()+1}/${t.getDate()} · 周${['日','一','二','三','四','五','六'][t.getDay()]}`;
+})();
+
+// PWA standalone 检测
+if(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true){
+  document.body.classList.add('pwa');
+}
+
+// Service Worker：缓存当前页面，实现离线可用
+if('serviceWorker' in navigator){
+  const swCode = `
+    const CACHE='solo-english-v1';
+    self.addEventListener('install',e=>{
+      self.skipWaiting();
+      e.waitUntil(caches.open(CACHE).then(c=>c.addAll([self.registration.scope])));
+    });
+    self.addEventListener('activate',e=>{ e.waitUntil(self.clients.claim()); });
+    self.addEventListener('fetch',e=>{
+      if(e.request.method!=='GET') return;
+      e.respondWith(
+        caches.match(e.request).then(r=> r || fetch(e.request).then(resp=>{
+          const copy=resp.clone();
+          caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{});
+          return resp;
+        }).catch(()=> caches.match(self.registration.scope)))
+      );
+    });
+  `;
+  const blob = new Blob([swCode],{type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(err=>console.log('SW注册失败:',err));
+}
+
+navigate('dashboard');
+</script>
+</body>
+</html>
