@@ -3,122 +3,166 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="theme-color" content="#2D5BFF" />
+<meta name="theme-color" content="#F8B4D9" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="教务" />
 <meta name="format-detection" content="telephone=no" />
-<!-- App 图标：蓝底白字"教" SVG -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='180'%20height='180'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='%232D5BFF'/%3E%3Ctext%20x='90'%20y='118'%20font-size='100'%20font-family='PingFang%20SC,Microsoft%20YaHei,sans-serif'%20font-weight='600'%20fill='white'%20text-anchor='middle'%3E%E6%95%99%3C/text%3E%3C/svg%3E" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='180'%20height='180'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='%232D5BFF'/%3E%3Ctext%20x='90'%20y='118'%20font-size='100'%20font-family='PingFang%20SC,Microsoft%20YaHei,sans-serif'%20font-weight='600'%20fill='white'%20text-anchor='middle'%3E%E6%95%99%3C/text%3E%3C/svg%3E" />
+<!-- App 图标：淡粉底深粉字"Diane" SVG -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='180'%20height='180'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='%23F8B4D9'/%3E%3Ctext%20x='90'%20y='108'%20font-size='32'%20font-family='PingFang%20SC,Microsoft%20YaHei,sans-serif'%20font-weight='700'%20fill='%239D174D'%20text-anchor='middle'%3EDiane%3C/text%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='180'%20height='180'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='%23F8B4D9'/%3E%3Ctext%20x='90'%20y='108'%20font-size='32'%20font-family='PingFang%20SC,Microsoft%20YaHei,sans-serif'%20font-weight='700'%20fill='%239D174D'%20text-anchor='middle'%3EDiane%3C/text%3E%3C/svg%3E" />
 <!-- 内联 PWA manifest -->
-<link rel="manifest" href='data:application/manifest+json,{"name":"英语教务","short_name":"教务","start_url":".","display":"standalone","background_color":"%235F7FB","theme_color":"%232D5BFF","orientation":"portrait","icons":[{"src":"data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27512%27%20height=%27512%27%20viewBox=%270%200%20512%20512%27%3E%3Crect%20width=%27512%27%20height=%27512%27%20rx=%27110%27%20fill=%27%232D5BFF%27/%3E%3Ctext%20x=%27256%27%20y=%27340%27%20font-size=%27280%27%20font-family=%27PingFang%20SC,Microsoft%20YaHei,sans-serif%27%20font-weight=%27600%27%20fill=%27white%27%20text-anchor=%27middle%27%3E%E6%95%99%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}]}' />
+<link rel="manifest" href='data:application/manifest+json,{"name":"Diane教务","short_name":"Diane","start_url":".","display":"standalone","background_color":"%23FDF2F8","theme_color":"%23F8B4D9","orientation":"portrait","icons":[{"src":"data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27512%27%20height=%27512%27%20viewBox=%270%200%20512%20512%27%3E%3Crect%20width=%27512%27%20height=%27512%27%20rx=%27110%27%20fill=%27%23F8B4D9%27/%3E%3Ctext%20x=%27256%27%20y=%27308%27%20font-size=%2790%27%20font-family=%27PingFang%20SC,Microsoft%20YaHei,sans-serif%27%20font-weight=%27700%27%20fill=%27%239D174D%27%20text-anchor=%27middle%27%3EDiane%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}]}' />
 <title>英语教务 · Solo</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   :root{
-    --bg:#F5F7FB;--card:#FFFFFF;--line:#E8ECF3;--text:#1B2230;--sub:#7A8497;
-    --primary:#2D5BFF;--primary-soft:#E7EDFF;--accent:#FF8A3D;--green:#1FB47A;--red:#E5484D;
-    --yellow:#FFB020;--shadow:0 2px 8px rgba(20,30,60,.06);
+    --bg:#F0F2F8;--card:#FFFFFF;--line:#E8ECF3;--text:#1B2230;--sub:#7A8497;
+    --primary:#5B4FE8;--primary-soft:#EEEAFE;--primary-dark:#4A3FC9;
+    --accent:#FF6B9D;--accent-soft:#FCE4EC;
+    --green:#10B981;--green-soft:#D1FAE5;
+    --red:#EF4444;--red-soft:#FEE2E2;
+    --yellow:#F59E0B;--yellow-soft:#FEF3C7;
+    --blue:#3B82F6;--blue-soft:#DBEAFE;
+    --shadow:0 1px 3px rgba(20,30,60,.04),0 4px 12px rgba(20,30,60,.05);
+    --shadow-md:0 4px 6px rgba(20,30,60,.04),0 10px 24px rgba(20,30,60,.06);
+    --radius:16px;--radius-sm:10px;
+    --sidebar-w:72px;
   }
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
     font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
-    /* iOS PWA 安全区适配 */
     padding-top:env(safe-area-inset-top);
     padding-left:env(safe-area-inset-left);
     padding-right:env(safe-area-inset-right);}
-  .app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--bg);
-    padding-bottom:calc(84px + env(safe-area-inset-bottom));position:relative;}
-  header.top{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
-    padding-top:calc(14px + env(safe-area-inset-top));
-    backdrop-filter:saturate(180%) blur(10px);
-    border-bottom:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
-  header.top h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.5px;}
+  /* 布局：左侧导航 + 右侧内容 */
+  .app{display:flex;min-height:100vh;background:var(--bg);}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);
+    background:linear-gradient(180deg,#FFFFFF 0%,#F8F9FE 100%);
+    z-index:60;display:flex;flex-direction:column;align-items:center;
+    padding-top:calc(20px + env(safe-area-inset-top));
+    padding-bottom:calc(16px + env(safe-area-inset-bottom));
+    border-right:1px solid var(--line);}
+  .sidebar .logo{width:40px;height:40px;border-radius:12px;
+    background:linear-gradient(135deg,#FBCFE8,#F8B4D9);
+    display:flex;align-items:center;justify-content:center;
+    color:#9D174D;font-size:13px;font-weight:700;margin-bottom:20px;
+    box-shadow:0 4px 12px rgba(248,180,217,.5);}
+  .sidebar .nav-items{flex:1;display:flex;flex-direction:column;gap:4px;width:100%;align-items:center;}
+  .sidebar .nav-btn{width:52px;padding:10px 0;border-radius:14px;
+    border:none;background:transparent;color:#9CA3AF;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:10px;cursor:pointer;transition:all .2s;font-weight:500;}
+  .sidebar .nav-btn svg{width:22px;height:22px;}
+  .sidebar .nav-btn:active{transform:scale(.92);}
+  /* 每个导航按钮不同颜色 */
+  .sidebar .nav-btn[data-page="dashboard"].active{background:#FCE4EC;color:#EC4899;}
+  .sidebar .nav-btn[data-page="dashboard"].active svg{color:#EC4899;}
+  .sidebar .nav-btn[data-page="schedule"].active{background:#DBEAFE;color:#3B82F6;}
+  .sidebar .nav-btn[data-page="schedule"].active svg{color:#3B82F6;}
+  .sidebar .nav-btn[data-page="attendance"].active{background:#D1FAE5;color:#10B981;}
+  .sidebar .nav-btn[data-page="attendance"].active svg{color:#10B981;}
+  .sidebar .nav-btn[data-page="classes"].active{background:#FEF3C7;color:#F59E0B;}
+  .sidebar .nav-btn[data-page="classes"].active svg{color:#F59E0B;}
+  .sidebar .nav-btn[data-page="more"].active{background:#EDE9FE;color:#8B5CF6;}
+  .sidebar .nav-btn[data-page="more"].active svg{color:#8B5CF6;}
+  .main-wrap{margin-left:var(--sidebar-w);flex:1;min-width:0;}
+  header.top{position:sticky;top:0;z-index:50;background:rgba(240,242,248,.85);
+    padding-top:calc(12px + env(safe-area-inset-top));
+    backdrop-filter:saturate(180%) blur(16px);
+    border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+  header.top h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.3px;}
   header.top .sub{font-size:12px;color:var(--sub);}
-  main{padding:14px 14px 24px;}
-  .card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);
-    border:1px solid var(--line);margin-bottom:12px;}
-  .card h3{margin:0 0 10px 0;font-size:15px;display:flex;align-items:center;gap:6px;}
+  main{padding:12px 12px 24px;max-width:600px;margin:0 auto;}
+  .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);
+    border:none;margin-bottom:12px;}
+  .card h3{margin:0 0 12px 0;font-size:15px;display:flex;align-items:center;gap:6px;font-weight:600;}
   .card h3 .dot{width:6px;height:6px;background:var(--primary);border-radius:50%;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-  .stat{padding:12px;border-radius:12px;background:linear-gradient(135deg,#E7EDFF,#F3F6FF);}
-  .stat .lbl{font-size:12px;color:var(--sub);margin-bottom:4px;}
-  .stat .val{font-size:20px;font-weight:600;color:var(--text);}
+  .stat{padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--primary-soft),#F5F3FF);position:relative;overflow:hidden;}
+  .stat .lbl{font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:500;}
+  .stat .val{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.5px;}
   .stat .unit{font-size:12px;color:var(--sub);font-weight:400;margin-left:2px;}
-  .stat.green{background:linear-gradient(135deg,#E2F8EE,#F1FBF6);}
+  .stat.green{background:linear-gradient(135deg,var(--green-soft),#ECFDF5);}
+  .stat.green .val{color:var(--green);}
   .stat.orange{background:linear-gradient(135deg,#FFEEDE,#FFF6EE);}
-  .stat.yellow{background:linear-gradient(135deg,#FFF4D6,#FFFBEC);}
-  .stat.red{background:linear-gradient(135deg,#FFE5E7,#FFEEEE);}
+  .stat.orange .val{color:#EA7C2C;}
+  .stat.yellow{background:linear-gradient(135deg,var(--yellow-soft),#FFFBEB);}
+  .stat.yellow .val{color:#D97706;}
+  .stat.red{background:linear-gradient(135deg,var(--red-soft),#FEF2F2);}
+  .stat.red .val{color:var(--red);}
+  .stat.blue{background:linear-gradient(135deg,var(--blue-soft),#EFF6FF);}
+  .stat.blue .val{color:var(--blue);}
+  .stat.pink{background:linear-gradient(135deg,var(--accent-soft),#FDF2F8);}
+  .stat.pink .val{color:var(--accent);}
   .row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
   .row + .row{margin-top:8px;}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;
-    padding:8px 14px;border-radius:10px;border:none;background:var(--primary);color:#fff;
-    font-size:14px;font-weight:500;cursor:pointer;transition:opacity .15s;}
-  .btn:active{opacity:.75;}
-  .btn.secondary{background:var(--primary-soft);color:var(--primary);}
-  .btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary);}
-  .btn.danger{background:var(--red);}
-  .btn.sm{padding:5px 10px;font-size:12px;border-radius:8px;}
-  .btn.block{width:100%;padding:12px;font-size:15px;}
-  .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:500;}
+    padding:9px 16px;border-radius:var(--radius-sm);border:none;
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;
+    box-shadow:0 2px 8px rgba(91,79,232,.2);}
+  .btn:active{transform:scale(.95);opacity:.9;}
+  .btn.secondary{background:var(--primary-soft);color:var(--primary);box-shadow:none;}
+  .btn.ghost{background:transparent;color:var(--primary);border:1.5px solid var(--primary);box-shadow:none;}
+  .btn.danger{background:linear-gradient(135deg,var(--red),#DC2626);box-shadow:0 2px 8px rgba(239,68,68,.2);}
+  .btn.success{background:linear-gradient(135deg,var(--green),#059669);box-shadow:0 2px 8px rgba(16,185,129,.2);}
+  .btn.sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+  .btn.block{width:100%;padding:13px;font-size:15px;}
+  .tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;}
   .tag.primary{background:var(--primary-soft);color:var(--primary);}
-  .tag.green{background:#E2F8EE;color:var(--green);}
-  .tag.red{background:#FFE5E7;color:var(--red);}
-  .tag.yellow{background:#FFF4D6;color:#B67800;}
+  .tag.green{background:var(--green-soft);color:var(--green);}
+  .tag.red{background:var(--red-soft);color:var(--red);}
+  .tag.yellow{background:var(--yellow-soft);color:#D97706;}
   .tag.gray{background:#EEF1F6;color:var(--sub);}
-  .list-item{padding:10px 0;border-bottom:1px solid var(--line);}
+  .tag.blue{background:var(--blue-soft);color:var(--blue);}
+  .tag.pink{background:var(--accent-soft);color:var(--accent);}
+  .list-item{padding:12px 0;border-bottom:1px solid var(--line);}
   .list-item:last-child{border-bottom:none;}
   .list-item .top-line{display:flex;justify-content:space-between;align-items:center;}
-  .list-item .name{font-weight:500;}
-  .list-item .meta{font-size:12px;color:var(--sub);margin-top:2px;}
-  .input, select, textarea{width:100%;padding:10px 12px;border:1px solid var(--line);
-    border-radius:10px;background:#fff;font-size:14px;font-family:inherit;color:var(--text);
-    outline:none;transition:border .15s;}
-  .input:focus,select:focus,textarea:focus{border-color:var(--primary);}
-  .field{margin-bottom:10px;}
-  .field label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px;}
-  .form-actions{display:flex;gap:8px;margin-top:14px;}
+  .list-item .name{font-weight:600;}
+  .list-item .meta{font-size:12px;color:var(--sub);margin-top:3px;}
+  .input, select, textarea{width:100%;padding:11px 14px;border:1.5px solid var(--line);
+    border-radius:var(--radius-sm);background:#fff;font-size:14px;font-family:inherit;color:var(--text);
+    outline:none;transition:all .15s;}
+  .input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft);}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12px;color:var(--sub);margin-bottom:5px;font-weight:500;}
+  .form-actions{display:flex;gap:8px;margin-top:16px;}
   .form-actions .btn{flex:1;}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
-    display:flex;justify-content:space-around;align-items:center;padding:6px 0 max(6px,env(safe-area-inset-bottom));
-    z-index:60;max-width:520px;margin:0 auto;}
-  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
-    padding:4px;color:var(--sub);font-size:11px;cursor:pointer;border:none;background:transparent;}
-  .tab .ico{width:22px;height:22px;display:inline-block;}
-  .tab.active{color:var(--primary);font-weight:600;}
-  .tab .ico svg{width:22px;height:22px;}
   .empty{padding:30px 10px;text-align:center;color:var(--sub);font-size:13px;}
   .empty .ic{font-size:32px;margin-bottom:6px;opacity:.5;}
   .badge{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;
     background:var(--red);color:#fff;border-radius:9px;font-size:11px;padding:0 5px;margin-left:4px;}
-  .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:99px;
-    background:var(--primary-soft);color:var(--primary);font-size:12px;}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;
+    background:var(--primary-soft);color:var(--primary);font-size:12px;font-weight:500;}
 
   /* Schedule */
   .sched-week{display:grid;grid-template-columns:48px repeat(7,1fr);gap:2px;
-    background:var(--line);border-radius:10px;overflow:hidden;font-size:11px;}
+    background:var(--line);border-radius:var(--radius-sm);overflow:hidden;font-size:11px;}
   .sched-week .hd{background:#fff;padding:6px 2px;text-align:center;font-weight:600;color:var(--sub);}
-  .sched-week .hd.today{color:var(--primary);}
+  .sched-week .hd.today{color:var(--primary);background:var(--primary-soft);}
   .sched-week .hcell{background:#F9FAFC;padding:4px 2px;text-align:center;color:var(--sub);font-size:11px;}
   .sched-week .cell{background:#fff;min-height:48px;padding:2px;position:relative;font-size:10px;}
   .sched-week .slot{background:var(--primary-soft);border-left:3px solid var(--primary);
-    border-radius:4px;padding:2px 3px;color:var(--primary);font-size:10px;line-height:1.2;cursor:pointer;}
+    border-radius:6px;padding:3px 4px;color:var(--primary);font-size:10px;line-height:1.3;cursor:pointer;
+    transition:all .15s;}
+  .sched-week .slot:active{transform:scale(.95);}
   .sched-week .slot .nm{font-weight:600;display:block;}
   .sched-week .slot .tm{opacity:.75;}
 
   /* Drawer / Modal */
-  .mask{position:fixed;inset:0;background:rgba(15,20,40,.45);z-index:100;
-    display:none;align-items:flex-end;justify-content:center;}
+  .mask{position:fixed;inset:0;background:rgba(15,20,40,.5);z-index:100;
+    display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
   .mask.show{display:flex;}
-  .sheet{background:#fff;width:100%;max-width:520px;border-radius:18px 18px 0 0;
-    padding:18px 16px 24px;max-height:88vh;overflow-y:auto;animation:slideUp .25s ease;}
+  .sheet{background:#fff;width:100%;max-width:600px;border-radius:24px 24px 0 0;
+    padding:20px 18px 28px;max-height:88vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1);}
   @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-  .sheet h2{margin:0 0 4px 0;font-size:17px;}
-  .sheet .sheet-sub{color:var(--sub);font-size:12px;margin-bottom:14px;}
-  .sheet .grab{width:40px;height:4px;background:#D8DEEA;border-radius:2px;margin:-6px auto 12px;}
+  .sheet h2{margin:0 0 4px 0;font-size:18px;font-weight:700;}
+  .sheet .sheet-sub{color:var(--sub);font-size:13px;margin-bottom:16px;}
+  .sheet .grab{width:40px;height:4px;background:#D8DEEA;border-radius:2px;margin:-8px auto 14px;}
 
   /* Switch */
   .switch{position:relative;display:inline-block;width:42px;height:24px;}
@@ -155,10 +199,11 @@
   .page{display:none;}
   .page.active{display:block;}
 
-  .fab{position:fixed;right:18px;bottom:calc(96px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;
-    background:var(--primary);color:#fff;border:none;box-shadow:0 6px 16px rgba(45,91,255,.35);
-    font-size:26px;line-height:50px;text-align:center;cursor:pointer;z-index:40;
-    max-width:calc(520px - 36px);}
+  .fab{position:fixed;right:18px;bottom:calc(24px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none;
+    box-shadow:0 6px 20px rgba(91,79,232,.4);
+    font-size:26px;line-height:52px;text-align:center;cursor:pointer;z-index:40;
+    max-width:calc(600px - 36px);}
 
   .seg{display:flex;gap:6px;}
   .seg .btn{flex:1;padding:8px;}
@@ -194,38 +239,41 @@
 </head>
 <body>
 <div class="app">
-  <header class="top">
-    <div>
-      <h1 id="topTitle">教务</h1>
-      <div class="sub" id="topDate"></div>
+  <nav class="sidebar">
+    <div class="logo">Diane</div>
+    <div class="nav-items">
+      <button class="nav-btn active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
+        首页
+      </button>
+      <button class="nav-btn" data-page="schedule">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        课表
+      </button>
+      <button class="nav-btn" data-page="attendance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        消课
+      </button>
+      <button class="nav-btn" data-page="classes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        班级
+      </button>
+      <button class="nav-btn" data-page="more">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        更多
+      </button>
     </div>
-    <div class="sub" id="topRight"></div>
-  </header>
-
-  <main id="main"></main>
-
-  <nav class="tabbar">
-    <button class="tab active" data-page="dashboard">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg></span>
-      首页
-    </button>
-    <button class="tab" data-page="schedule">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
-      课表
-    </button>
-    <button class="tab" data-page="attendance">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
-      消课
-    </button>
-    <button class="tab" data-page="classes">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>
-      班级
-    </button>
-    <button class="tab" data-page="more">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></span>
-      更多
-    </button>
   </nav>
+  <div class="main-wrap">
+    <header class="top">
+      <div>
+        <h1 id="topTitle">教务</h1>
+        <div class="sub" id="topDate"></div>
+      </div>
+      <div class="sub" id="topRight"></div>
+    </header>
+    <main id="main"></main>
+  </div>
 </div>
 
 <div class="mask" id="mask">
@@ -269,7 +317,7 @@ const Store = {
         {id:'p7',name:'KET 强化',type:'KET强化18',lessons:18,amount:11700,earlyBird:9900,note:'第二阶段'},
         {id:'p8',name:'KET 冲刺',type:'KET冲刺12',lessons:12,amount:7800,earlyBird:6600,note:'第三阶段'},
         {id:'p9',name:'KET 全程包',type:'KET全程48',lessons:48,amount:31200,earlyBird:26400,note:'进阶+强化+冲刺'},
-        {id:'p10',name:'单次课',type:'单次课',lessons:1,amount:0,earlyBird:0,note:'价格按次定，随课结算'},
+        {id:'p10',name:'自定义课包',type:'自定义课包',lessons:1,amount:0,earlyBird:0,note:'次数和价格自定'},
       ],
       students:[
         {id:'s1',name:'林小明',parent:'林妈妈',phone:'138****1234',note:'KET准备中',joinDate:dPlus(-90)},
@@ -502,7 +550,7 @@ Pages.dashboard = function(){
       <div class="val num">${U.fmtMoney(monthIncome)}</div>
     </div>
     <div class="stat orange">
-      <div class="lbl">待缴分期</div>
+      <div class="lbl">待缴余款</div>
       <div class="val num">${U.fmtMoney(pending)}</div>
     </div>
     <div class="stat yellow">
@@ -891,13 +939,13 @@ Pages.income = function(){
     <div class="grid2">
       <div class="stat green"><div class="lbl">本月收入</div><div class="val num">${U.fmtMoney(monthIncome)}</div></div>
       <div class="stat"><div class="lbl">累计收入</div><div class="val num">${U.fmtMoney(totalIncome)}</div></div>
-      <div class="stat orange"><div class="lbl">待缴分期</div><div class="val num">${U.fmtMoney(pending.reduce((a,p)=>a+(p.totalAmount-p.paidAmount),0))}</div></div>
+      <div class="stat orange"><div class="lbl">待缴余款</div><div class="val num">${U.fmtMoney(pending.reduce((a,p)=>a+(p.totalAmount-p.paidAmount),0))}</div></div>
       <div class="stat yellow"><div class="lbl">缴费笔数</div><div class="val num">${D.payments.length}</div></div>
     </div>
   </div>
   ${pending.length>0?`
   <div class="card">
-    <h3><span class="dot"></span>待缴分期</h3>
+    <h3><span class="dot" style="background:var(--yellow)"></span>待缴余款</h3>
     ${pending.map(p=>{
       const s=getStudent(p.studentId);
       const left=p.totalAmount-p.paidAmount;
@@ -929,7 +977,7 @@ Pages.income = function(){
       const s=getStudent(p.studentId);
       return `<div class="qr-item">
         <div class="l">${U.escape(s.name)}<br><span class="muted">${U.escape(p.packageName)}</span></div>
-        <div class="r">${U.fmtMoney(p.paidAmount)}<br><span class="muted">${p.date}${p.installments>1?` · ${p.installments}期`:''}</span></div>
+        <div class="r">${U.fmtMoney(p.paidAmount)}<br><span class="muted">${p.date}</span></div>
       </div>`;
     }).join('')}
   </div>
@@ -1052,16 +1100,30 @@ Pages.classSchedules = function(){
 };
 
 Pages.more = function(){
+  const menuItems=[
+    {page:'students',label:'学生管理',icon:'👤',desc:'查看和管理所有学生',color:'blue'},
+    {page:'classSchedules',label:'班级课表',icon:'📅',desc:'查看各班完整排课',color:'primary'},
+    {page:'statistics',label:'课时统计',icon:'📊',desc:'消课数据和剩余课时',color:'green'},
+    {page:'income',label:'收入管理',icon:'💰',desc:'缴费记录和收入统计',color:'orange'},
+    {page:'prices',label:'价格表',icon:'🏷️',desc:'课程包定价和优惠',color:'pink'},
+  ];
   return `
   <div class="card">
     <h3><span class="dot"></span>工作台</h3>
-    <div class="grid2">
-      <button class="btn secondary" onclick="navigate('students')">学生</button>
-      <button class="btn secondary" onclick="navigate('classSchedules')">班级课表</button>
-      <button class="btn secondary" onclick="navigate('statistics')">课时统计</button>
-      <button class="btn secondary" onclick="navigate('income')">收入</button>
-      <button class="btn secondary" onclick="navigate('prices')">价格表</button>
-    </div>
+    ${menuItems.map(m=>`
+      <div class="list-item" style="cursor:pointer;" onclick="navigate('${m.page}')">
+        <div class="top-line">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;" class="stat ${m.color}">${m.icon}</div>
+            <div>
+              <div class="name">${m.label}</div>
+              <div class="meta">${m.desc}</div>
+            </div>
+          </div>
+          <span style="color:var(--sub);font-size:20px;">›</span>
+        </div>
+      </div>
+    `).join('')}
   </div>
   <div class="card">
     <h3><span class="dot"></span>数据</h3>
@@ -1069,7 +1131,7 @@ Pages.more = function(){
       <div>本地存储</div>
       <span class="tag green">${(JSON.stringify(D).length/1024).toFixed(1)} KB</span>
     </div>
-    <div class="row" style="margin-top:8px;">
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
       <button class="btn sm" onclick="exportData()">导出数据</button>
       <button class="btn sm secondary" onclick="document.getElementById('importFile').click()">导入数据</button>
       <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)"/>
@@ -1088,7 +1150,7 @@ let currentPage = 'dashboard';
 function navigate(p, replace){
   currentPage = p;
   document.getElementById('main').innerHTML = Pages[p]();
-  [...document.querySelectorAll('.tab')].forEach(t=>t.classList.toggle('active',t.dataset.page===p || (p==='students'&&t.dataset.page==='more') || (p==='statistics'&&t.dataset.page==='more') || (p==='income'&&t.dataset.page==='more') || (p==='prices'&&t.dataset.page==='more') || (p==='classSchedules'&&t.dataset.page==='more')));
+  [...document.querySelectorAll('.nav-btn')].forEach(t=>t.classList.toggle('active',t.dataset.page===p || (p==='students'&&t.dataset.page==='more') || (p==='statistics'&&t.dataset.page==='more') || (p==='income'&&t.dataset.page==='more') || (p==='prices'&&t.dataset.page==='more') || (p==='classSchedules'&&t.dataset.page==='more')));
   // update title
   const titleMap={dashboard:'首页',schedule:'周课表',attendance:'消课',classes:'班级',students:'学生',statistics:'课时统计',income:'收入',prices:'价格表',classSchedules:'班级课表',more:'更多'};
   document.getElementById('topTitle').textContent = titleMap[p]||'教务';
@@ -1097,7 +1159,7 @@ function navigate(p, replace){
   window.scrollTo(0,0);
 }
 
-document.querySelectorAll('.tab').forEach(t=>{
+document.querySelectorAll('.nav-btn').forEach(t=>{
   t.addEventListener('click',()=>navigate(t.dataset.page));
 });
 
@@ -1703,7 +1765,7 @@ function quickEnroll(sid){
     <div class="sheet-sub">为该学生报名一个课程包，自动加课时</div>
     <div class="field"><label>选择课程包</label>
       <select class="input" id="enPkg">
-        ${D.packages.map(p=>`<option value="${p.id}">${U.escape(p.name)} · ${p.lessons}次 · ${U.fmtMoney(p.amount)}（早鸟${U.fmtMoney(p.earlyBird||0)}）</option>`).join('')}
+        ${D.packages.map(p=>`<option value="${p.id}">${U.escape(p.name)} · ${p.lessons}次 · ${p.amount>0?U.fmtMoney(p.amount):'价格自定'}${p.earlyBird>0?'（早鸟'+U.fmtMoney(p.earlyBird)+'）':''}</option>`).join('')}
       </select>
     </div>
     <div class="grid2">
@@ -1712,9 +1774,8 @@ function quickEnroll(sid){
     </div>
     <div class="grid2">
       <div class="field"><label>总金额</label><input class="input" id="enTotal" type="number" value="0"/></div>
-      <div class="field"><label>分期数</label><input class="input" id="enInst" type="number" value="1" min="1"/></div>
+      <div class="field"><label>备注</label><input class="input" id="enNote" placeholder="选填"/></div>
     </div>
-    <div class="field"><label>备注</label><input class="input" id="enNote"/></div>
     <div class="form-actions">
       <button class="btn secondary" onclick="closeSheet()">取消</button>
       <button class="btn" onclick="commitEnroll('${sid}')">确认报名</button>
@@ -1738,11 +1799,10 @@ function commitEnroll(sid){
   const date=document.getElementById('enDate').value;
   const total=+document.getElementById('enTotal').value||p.amount;
   const paid=+document.getElementById('enPaid').value;
-  const inst=+document.getElementById('enInst').value||1;
   const note=document.getElementById('enNote').value;
   const eid=U.id();
   D.enrollments.push({id:eid,studentId:sid,packageId:pid,totalLessons:p.lessons,remaining:p.lessons,used:0,enrolledAt:date});
-  D.payments.push({id:U.id(),studentId:sid,enrollmentId:eid,packageName:p.name,totalAmount:total,paidAmount:paid,installments:inst,date,note});
+  D.payments.push({id:U.id(),studentId:sid,enrollmentId:eid,packageName:p.name,totalAmount:total,paidAmount:paid,installments:1,date,note});
   Store.save(); closeSheet(); navigate('students'); U.toast('已报名并加课时');
 }
 
@@ -1753,15 +1813,12 @@ function openAddPayment(){
     <div class="field"><label>学生</label>
       <select class="input" id="payStu">${D.students.map(s=>`<option value="${s.id}">${U.escape(s.name)}</option>`).join('')}</select>
     </div>
-    <div class="field"><label>所报包</label><input class="input" id="payPkg" placeholder="如：Power Up 1学期包"/></div>
+    <div class="field"><label>项目名称</label><input class="input" id="payPkg" placeholder="如：Power Up 1学期包 / 单次课"/></div>
     <div class="grid2">
       <div class="field"><label>总金额</label><input class="input" id="payTotal" type="number"/></div>
       <div class="field"><label>本次实收</label><input class="input" id="payPaid" type="number"/></div>
     </div>
-    <div class="grid2">
-      <div class="field"><label>日期</label><input class="input" id="payDate" type="date" value="${U.todayYmd()}"/></div>
-      <div class="field"><label>分期数</label><input class="input" id="payInst" type="number" value="1" min="1"/></div>
-    </div>
+    <div class="field"><label>日期</label><input class="input" id="payDate" type="date" value="${U.todayYmd()}"/></div>
     <div class="form-actions">
       <button class="btn secondary" onclick="closeSheet()">取消</button>
       <button class="btn" onclick="commitPayment()">保存</button>
@@ -1774,8 +1831,7 @@ function commitPayment(){
   const total=+document.getElementById('payTotal').value||0;
   const paid=+document.getElementById('payPaid').value||0;
   const date=document.getElementById('payDate').value;
-  const inst=+document.getElementById('payInst').value||1;
-  D.payments.push({id:U.id(),studentId:sid,enrollmentId:'',packageName:pkgName,totalAmount:total,paidAmount:paid,installments:inst,date});
+  D.payments.push({id:U.id(),studentId:sid,enrollmentId:'',packageName:pkgName,totalAmount:total,paidAmount:paid,installments:1,date});
   Store.save(); closeSheet(); navigate('income'); U.toast('已记录');
 }
 function recordPayment(pid){
@@ -1806,11 +1862,11 @@ function openAddPackage(){
     <h2>新增课程包</h2>
     <div class="field"><label>包名</label><input class="input" id="apName"/></div>
     <div class="field"><label>类型</label>
-      <select class="input" id="apType">
+      <select class="input" id="apType" onchange="onPkgTypeChange('ap')">
         <option>启蒙45次</option><option>PowerUp1学期15次</option><option>PowerUp2学期15次</option>
         <option>PowerUp3学期15次</option><option>PowerUp4学期15次</option>
         <option>KET进阶18</option><option>KET强化18</option><option>KET冲刺12</option>
-        <option>单次课</option>
+        <option>自定义课包</option>
       </select>
     </div>
     <div class="grid3">
@@ -1824,6 +1880,20 @@ function openAddPackage(){
       <button class="btn" onclick="savePackage()">保存</button>
     </div>
   `);
+  onPkgTypeChange('ap');
+}
+function onPkgTypeChange(prefix){
+  const typeEl=document.getElementById(prefix+'Type');
+  if(!typeEl)return;
+  const isCustom=typeEl.value==='自定义课包';
+  const lesEl=document.getElementById(prefix+'Les');
+  const amtEl=document.getElementById(prefix+'Amt');
+  const ebEl=document.getElementById(prefix+'EB');
+  if(isCustom){
+    if(lesEl){lesEl.value='';lesEl.placeholder='填次数';}
+    if(amtEl){amtEl.value='';amtEl.placeholder='填价格';}
+    if(ebEl){ebEl.value='';ebEl.placeholder='选填';}
+  }
 }
 function savePackage(){
   D.packages.push({
