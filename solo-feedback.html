@@ -241,6 +241,13 @@ const Store={
         // 缓存到 localStorage
         localStorage.setItem(LS_KEY,JSON.stringify({data:this.data,sha:this.sha}));
         return;
+      }else if(resp.status===401){
+        // Token 失效
+        U.toast('⚠️ Token已失效，请重新输入');
+        GH_TOKEN='';
+        localStorage.removeItem('gh_token');
+        setTimeout(()=>this.promptToken(),1500);
+        return;
       }else if(resp.status===404){
         // 仓库里还没有 data.json，用种子数据初始化
         if(!this.data){
@@ -248,6 +255,8 @@ const Store={
         }
         await this.save();
         return;
+      }else{
+        console.log('GitHub fetch failed:',resp.status);
       }
     }catch(e){console.log('GitHub fetch failed:',e);}
 
@@ -284,8 +293,26 @@ const Store={
           const json=await resp.json();
           this.sha=json.content.sha;
           localStorage.setItem(LS_KEY,JSON.stringify({data:this.data,sha:this.sha}));
+          U.toast('✓ 已同步到云端');
+        }else if(resp.status===401){
+          // Token 失效
+          U.toast('⚠️ Token已失效，请重新输入');
+          GH_TOKEN='';
+          localStorage.removeItem('gh_token');
+          setTimeout(()=>this.promptToken(),1500);
+        }else if(resp.status===409){
+          // sha 冲突，需要重新拉取
+          U.toast('⚠️ 数据版本冲突，正在同步...');
+          await this.fetchFromGitHub();
+        }else{
+          const errText=await resp.text().catch(()=>'');
+          console.log('GitHub save failed:',resp.status,errText);
+          U.toast('⚠️ 同步失败('+resp.status+')，数据已保存在本地');
         }
-      }catch(e){console.log('GitHub save failed:',e);}
+      }catch(e){
+        console.log('GitHub save failed:',e);
+        U.toast('⚠️ 网络错误，数据已保存在本地');
+      }
     },500);
   },
 
