@@ -1244,35 +1244,41 @@ function openShareLink(id){
   openSheet(`
     <h2>家长专属链接</h2>
     <div class="sheet-sub">${U.escape(s.name)} · ${U.escape(s.parentName)}</div>
-    <div class="link-box">
-      <div style="font-size:13px;color:var(--sub);margin-bottom:6px;">家长打开链接，输入密码查看：</div>
-      <div class="url">${linkUrl}</div>
-      <div style="margin-top:8px;font-size:13px;color:var(--sub);">密码：<strong style="color:var(--text);">${U.escape(s.password)}</strong></div>
-    </div>
     <div style="font-size:12px;color:var(--sub);line-height:1.7;margin:8px 0;">
       <div>• 家长只能看到 ${U.escape(s.name)} 的反馈</div>
       <div>• 苹果、安卓手机都能用</div>
     </div>
-    <div class="form-actions">
+    <div style="font-size:13px;color:var(--sub);margin-bottom:6px;">👇 点击下方文字框，全选后复制，发给家长：</div>
+    <textarea id="shareLinkBox" readonly style="width:100%;font-size:14px;padding:12px;border:2px solid var(--primary);border-radius:10px;min-height:100px;font-family:inherit;line-height:1.6;color:var(--text);" onclick="this.select();document.execCommand('copy');U.toast('✓ 已复制')">${fullText}</textarea>
+    <div style="margin-top:8px;font-size:12px;color:var(--sub);">点击文字框会自动全选并复制，也可长按手动选择复制</div>
+    <div class="form-actions" style="margin-top:12px;">
       <button class="btn secondary" onclick="closeSheet()">关闭</button>
       <button class="btn" onclick="copyLink('${id}')">复制链接+密码</button>
     </div>
     <div style="margin-top:10px;">
       <button class="btn ghost block" onclick="resetStudentToken('${id}')">重新生成链接</button>
     </div>
-    <div style="margin-top:14px;">
-      <div style="font-size:12px;color:var(--sub);margin-bottom:6px;">👇 如果上面的按钮复制不成功，长按下方文字框全选复制：</div>
-      <textarea readonly style="width:100%;font-size:13px;padding:10px;border:1px solid var(--line);border-radius:8px;min-height:80px;font-family:inherit;" onclick="this.select()">${fullText}</textarea>
-    </div>
   `);
+  setTimeout(()=>{const box=document.getElementById('shareLinkBox');if(box){box.focus();box.select();}},200);
 }
 function copyLink(id){
   const s=getStudent(id);
   const linkUrl=`https://douououououou.github.io/solo-english-feedback/parent-view.html?v=3&token=${s.token}`;
   const text=`${s.name}的学情反馈链接：\n${linkUrl}\n查看密码：${s.password}`;
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(()=>U.toast('✓ 已复制，去粘贴给家长')).catch(()=>fallbackCopy(text));
-  }else{fallbackCopy(text);}
+  // 先尝试剪贴板API
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>U.toast('✓ 已复制，去粘贴给家长')).catch(()=>{
+      // 失败则选中文本框
+      const box=document.getElementById('shareLinkBox');
+      if(box){box.focus();box.select();document.execCommand('copy');U.toast('✓ 已复制');}
+      else{U.toast('请点击上方文字框手动复制');}
+    });
+  }else{
+    // 非安全上下文，用 execCommand
+    const box=document.getElementById('shareLinkBox');
+    if(box){box.focus();box.select();document.execCommand('copy');U.toast('✓ 已复制，去粘贴给家长');}
+    else{fallbackCopy(text);}
+  }
 }
 function fallbackCopy(text){
   const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
