@@ -1239,12 +1239,14 @@ function buildAssessmentAnalysis(name,scores,overall,comment,type){
 /* ============== Share link ============== */
 function openShareLink(id){
   const s=getStudent(id);if(!s)return;
+  const linkUrl=`https://douououououou.github.io/solo-english-feedback/parent-view.html?v=3&token=${s.token}`;
+  const fullText=`${s.name}的学情反馈链接：\n${linkUrl}\n查看密码：${s.password}`;
   openSheet(`
     <h2>家长专属链接</h2>
     <div class="sheet-sub">${U.escape(s.name)} · ${U.escape(s.parentName)}</div>
     <div class="link-box">
       <div style="font-size:13px;color:var(--sub);margin-bottom:6px;">家长打开链接，输入密码查看：</div>
-      <div class="url">https://douououououou.github.io/solo-english-feedback/parent-view.html?v=3&token=${s.token}</div>
+      <div class="url">${linkUrl}</div>
       <div style="margin-top:8px;font-size:13px;color:var(--sub);">密码：<strong style="color:var(--text);">${U.escape(s.password)}</strong></div>
     </div>
     <div style="font-size:12px;color:var(--sub);line-height:1.7;margin:8px 0;">
@@ -1258,18 +1260,23 @@ function openShareLink(id){
     <div style="margin-top:10px;">
       <button class="btn ghost block" onclick="resetStudentToken('${id}')">重新生成链接</button>
     </div>
+    <div style="margin-top:14px;">
+      <div style="font-size:12px;color:var(--sub);margin-bottom:6px;">👇 如果上面的按钮复制不成功，长按下方文字框全选复制：</div>
+      <textarea readonly style="width:100%;font-size:13px;padding:10px;border:1px solid var(--line);border-radius:8px;min-height:80px;font-family:inherit;" onclick="this.select()">${fullText}</textarea>
+    </div>
   `);
 }
 function copyLink(id){
   const s=getStudent(id);
-  const text=`${U.escape(s.name)}的学情反馈链接：\nhttps://douououououou.github.io/solo-english-feedback/parent-view.html?v=3&token=${s.token}\n查看密码：${s.password}`;
+  const linkUrl=`https://douououououou.github.io/solo-english-feedback/parent-view.html?v=3&token=${s.token}`;
+  const text=`${s.name}的学情反馈链接：\n${linkUrl}\n查看密码：${s.password}`;
   if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(()=>U.toast('已复制')).catch(()=>fallbackCopy(text));
+    navigator.clipboard.writeText(text).then(()=>U.toast('✓ 已复制，去粘贴给家长')).catch(()=>fallbackCopy(text));
   }else{fallbackCopy(text);}
 }
 function fallbackCopy(text){
   const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');U.toast('已复制');}catch(e){U.toast('复制失败');}
+  try{document.execCommand('copy');U.toast('✓ 已复制，去粘贴给家长');}catch(e){U.toast('复制失败，请长按下方文字框手动复制');}
   document.body.removeChild(ta);
 }
 function resetStudentToken(id){
