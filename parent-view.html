@@ -26,9 +26,11 @@
     padding:calc(14px + env(safe-area-inset-top)) 16px 14px;}
   header.top h1{margin:0;font-size:18px;font-weight:600;text-align:center;}
   header.top .sub{font-size:12px;color:var(--sub);text-align:center;margin-top:2px;}
+  header.top .back-btn{position:absolute;left:12px;top:calc(14px + env(safe-area-inset-top));
+    background:none;border:none;color:var(--primary);font-size:15px;cursor:pointer;
+    padding:4px 8px;display:none;}
+  header.top .back-btn.show{display:inline-flex;align-items:center;gap:2px;}
   main{padding:14px 14px 24px;}
-  .card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);
-    border:1px solid var(--line);margin-bottom:12px;}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;
     padding:12px 14px;border-radius:10px;border:none;background:var(--primary);color:#fff;
     font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s;width:100%;}
@@ -43,16 +45,41 @@
   .login-wrap .icon{font-size:48px;margin-bottom:12px;}
   .login-wrap h2{margin:0 0 6px 0;font-size:20px;}
   .login-wrap p{color:var(--sub);font-size:13px;margin:0 0 24px 0;}
+
+  /* Student header */
   .student-header{text-align:center;padding:20px 0 10px;}
   .student-header .avatar{width:56px;height:56px;border-radius:50%;background:var(--primary-soft);
     color:var(--primary);font-size:22px;font-weight:600;display:inline-flex;align-items:center;
     justify-content:center;margin-bottom:8px;}
   .student-header .name{font-size:18px;font-weight:600;}
   .student-header .meta{font-size:12px;color:var(--sub);margin-top:2px;}
+
+  /* Stats row */
   .stats-row{display:flex;gap:10px;margin-bottom:12px;}
   .stats-row .stat{flex:1;padding:10px;border-radius:10px;background:var(--primary-soft);text-align:center;}
   .stats-row .stat .lbl{font-size:11px;color:var(--sub);}
   .stats-row .stat .val{font-size:18px;font-weight:600;color:var(--primary);}
+
+  /* List items */
+  .list-section-title{font-size:13px;font-weight:600;color:var(--sub);
+    margin:18px 0 8px;padding-left:4px;display:flex;align-items:center;gap:6px;}
+  .list-section-title:first-child{margin-top:0;}
+  .list-item{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer;
+    transition:transform .12s,box-shadow .12s;display:flex;align-items:center;gap:12px;}
+  .list-item:active{transform:scale(.98);}
+  .list-item .li-icon{width:40px;height:40px;border-radius:12px;display:flex;
+    align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .list-item .li-body{flex:1;min-width:0;}
+  .list-item .li-title{font-size:15px;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .list-item .li-sub{font-size:12px;color:var(--sub);margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .list-item .li-arrow{color:var(--sub);font-size:18px;flex-shrink:0;}
+
+  /* Detail view */
+  .detail-view{display:none;}
+  .detail-view.show{display:block;}
 
   /* Feedback table */
   .fb-table{width:100%;border-collapse:collapse;font-size:13px;}
@@ -67,11 +94,13 @@
   .fb-table .date-col .d{font-weight:500;}
   .fb-table .date-col .w{font-size:11px;color:var(--sub);}
 
+  .card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);
+    border:1px solid var(--line);margin-bottom:12px;}
+
   /* Detail card */
   .detail-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;background:#fff;}
   .detail-card .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
   .detail-card .date{font-size:13px;color:var(--sub);}
-  .detail-card .tone-tag{padding:2px 8px;border-radius:99px;font-size:11px;background:var(--primary-soft);color:var(--primary);}
   .detail-card .content{font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap;}
 
   /* Assessment report */
@@ -88,8 +117,8 @@
   .assess-scores .si .sbar{height:4px;background:#EEF1F6;border-radius:2px;margin-top:6px;overflow:hidden;}
   .assess-scores .si .sbar-fill{height:100%;background:var(--primary);border-radius:2px;}
   .assess-analysis{background:#fff;border-radius:10px;padding:14px;font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text);}
-  .empty{padding:40px 20px;text-align:center;color:var(--sub);font-size:14px;}
 
+  .empty{padding:40px 20px;text-align:center;color:var(--sub);font-size:14px;}
   .empty .ic{font-size:40px;margin-bottom:8px;opacity:.5;}
   .teacher-footer{text-align:center;padding:16px;font-size:12px;color:var(--sub);}
   .toast{position:fixed;left:50%;top:30%;transform:translateX(-50%);
@@ -103,6 +132,7 @@
 <body>
 <div class="app">
   <header class="top">
+    <button class="back-btn" id="backBtn" onclick="goBack()">‹ 返回</button>
     <h1>📚 学情反馈</h1>
     <div class="sub" id="topSub"></div>
   </header>
@@ -121,53 +151,46 @@ const U={
 };
 
 function getToken(){
-  // 优先从 URL 参数读取
   const params=new URLSearchParams(window.location.search);
   const token=params.get('token')||'';
   if(token)return token;
-  // 兼容 path 形式：/view/TOKEN
   const parts=window.location.pathname.split('/');
   let t=parts[parts.length-1]||parts[parts.length-2];
   if(t&&t!=='view'&&t!=='parent-view.html'&&!t.endsWith('.html'))return t;
   return '';
 }
 
-// GitHub Pages 直接读取 data.json（不需要 API token）
 const GH_RAW='https://douououououou.github.io/solo-english-feedback/data.json';
 
 async function fetchCloudData(){
   try{
     const url=GH_RAW+'?t='+Date.now();
     const resp=await fetch(url,{cache:'no-store'});
-    if(!resp.ok){
-      console.log('fetchCloudData: resp not ok', resp.status);
-      return null;
-    }
+    if(!resp.ok)return null;
     return await resp.json();
-  }catch(e){
-    console.log('fetchCloudData error:', e.message);
-    return null;
-  }
+  }catch(e){return null;}
 }
 
 async function loadStudentByToken(token){
   const data=await fetchCloudData();
-  if(!data){
-    console.log('loadStudentByToken: no data from cloud');
-    return null;
-  }
+  if(!data)return null;
   const student=(data.students||[]).find(s=>s.token===token);
-  if(!student){
-    console.log('loadStudentByToken: student not found, token=', token);
-    console.log('available tokens:', (data.students||[]).map(s=>s.token));
-    return null;
-  }
+  if(!student)return null;
   const feedbacks=(data.feedbacks||[]).filter(f=>f.studentId===student.id)
     .sort((a,b)=>b.date.localeCompare(a.date));
   return {student,feedbacks,teacher:data.teacher||{}};
 }
 
-let session={student:null,feedbacks:[],teacher:null,unlocked:false};
+let session={student:null,feedbacks:[],teacher:null,unlocked:false,currentView:'list'};
+
+const ASSESS_FIELDS=[
+  {key:'reading',label:'阅读',icon:'📖'},
+  {key:'listening',label:'听力',icon:'👂'},
+  {key:'speaking',label:'口语',icon:'🗣️'},
+  {key:'writing',label:'写作',icon:'✍️'},
+  {key:'vocabulary',label:'词汇',icon:'📚'},
+  {key:'grammar',label:'语法',icon:'🔤'},
+];
 
 async function init(){
   const token=getToken();
@@ -186,21 +209,20 @@ async function init(){
       </div>`;
     return;
   }
-  // 显示加载中
   document.getElementById('main').innerHTML=`
     <div class="login-wrap">
       <div class="icon">⏳</div>
       <h2>正在加载...</h2>
       <p>正在获取学情数据，请稍候</p>
     </div>`;
-  
+
   const data=await loadStudentByToken(token);
   if(!data){
     document.getElementById('main').innerHTML=`
-      <div class="empty"><div class="ic">😕</div><div>链接无效或已过期</div><div style="font-size:12px;margin-top:8px;">请联系老师获取最新链接</div><div style="font-size:11px;color:var(--sub);margin-top:8px;">token: ${token}</div></div>`;
+      <div class="empty"><div class="ic">😕</div><div>链接无效或已过期</div><div style="font-size:12px;margin-top:8px;">请联系老师获取最新链接</div></div>`;
     return;
   }
-  session={...data,unlocked:false};
+  session={...data,unlocked:false,currentView:'list'};
   renderLogin();
 }
 
@@ -214,6 +236,7 @@ function manualLogin(){
 function renderLogin(){
   const s=session.student;
   document.getElementById('topSub').textContent=`${U.escape(s.name)} 的学情反馈`;
+  document.getElementById('backBtn').classList.remove('show');
   document.getElementById('main').innerHTML=`
     <div class="login-wrap">
       <div class="icon">🔒</div>
@@ -229,34 +252,155 @@ function doUnlock(){
   const pwd=document.getElementById('pwdInput').value.trim();
   if(pwd!==session.student.password){U.toast('密码错误');return;}
   session.unlocked=true;
-  renderFeedbacks();
+  renderList();
 }
 
-function renderFeedbacks(){
+/* ===== 列表视图 ===== */
+function renderList(){
+  session.currentView='list';
   const s=session.student;
   const fbs=session.feedbacks;
   const t=session.teacher||{};
+  const a=s.assessment;
+  const stages=s.stageAssessments||[];
+
   document.getElementById('topSub').textContent=`${U.escape(s.name)} 的学情反馈`;
+  document.getElementById('backBtn').classList.remove('show');
   document.getElementById('teacherFooter').innerHTML=`${U.escape(t.name||'老师')} · ${U.escape(t.school||'')}<br/>如有疑问请直接联系老师`;
 
   const firstInitial=s.name?s.name[0]:'?';
   const total=fbs.length;
   const goodCount=fbs.filter(f=>f.homeworkDone&&f.attentive&&f.participated).length;
-  const hasExam=fbs.some(f=>f.dictation||f.quiz||f.assessment);
-  const a=s.assessment;
-  const stages=s.stageAssessments||[];
 
-  const ASSESS_FIELDS=[
-    {key:'reading',label:'阅读',icon:'📖'},
-    {key:'listening',label:'听力',icon:'👂'},
-    {key:'speaking',label:'口语',icon:'🗣️'},
-    {key:'writing',label:'写作',icon:'✍️'},
-    {key:'vocabulary',label:'词汇',icon:'📚'},
-    {key:'grammar',label:'语法',icon:'🔤'},
-  ];
+  // 统计行
+  const statsHtml=`
+    <div class="stats-row">
+      <div class="stat"><div class="lbl">总反馈</div><div class="val num">${total}</div></div>
+      <div class="stat"><div class="lbl">全优次数</div><div class="val num">${goodCount}</div></div>
+      <div class="stat"><div class="lbl">本月</div><div class="val num">${countThisMonth(fbs)}</div></div>
+    </div>`;
 
-  const renderAssessCard=(a,title,bgGradient)=>{
-    return `
+  // 构建列表项
+  let listItems='';
+
+  // 新生测评
+  if(a){
+    listItems+=`
+      <div class="list-item" onclick="openItem('newAssess')">
+        <div class="li-icon" style="background:#E7EDFF;">📋</div>
+        <div class="li-body">
+          <div class="li-title">新生测评报告</div>
+          <div class="li-sub">综合等级：${U.escape(a.overall||'-')} · ${U.fmtDate(a.date)}</div>
+        </div>
+        <div class="li-arrow">›</div>
+      </div>`;
+  }
+
+  // 阶段测评
+  if(stages.length>0){
+    stages.forEach((st,i)=>{
+      listItems+=`
+        <div class="list-item" onclick="openItem('stageAssess',${i})">
+          <div class="li-icon" style="background:#FFF4D6;">📊</div>
+          <div class="li-body">
+            <div class="li-title">阶段测评（第${i+1}次）</div>
+            <div class="li-sub">综合等级：${U.escape(st.overall||'-')} · ${U.fmtDate(st.date)}</div>
+          </div>
+          <div class="li-arrow">›</div>
+        </div>`;
+    });
+  }
+
+  // 课堂表现一览（表格）
+  if(fbs.length>0){
+    listItems+=`
+      <div class="list-item" onclick="openItem('overview')">
+        <div class="li-icon" style="background:#D1FAE5;">📈</div>
+        <div class="li-body">
+          <div class="li-title">课堂表现一览</div>
+          <div class="li-sub">${total} 条记录 · 作业完成率 ${rate(fbs,'homeworkDone')}</div>
+        </div>
+        <div class="li-arrow">›</div>
+      </div>`;
+  }
+
+  // 逐课反馈
+  fbs.forEach((f,idx)=>{
+    const d=new Date(f.date);
+    const tags=[];
+    if(f.homeworkDone)tags.push('作业✓');
+    if(f.attentive)tags.push('认真✓');
+    if(!f.homeworkDone)tags.push('作业✗');
+    listItems+=`
+      <div class="list-item" onclick="openItem('feedback',${idx})">
+        <div class="li-icon" style="background:#F3F0FF;">📝</div>
+        <div class="li-body">
+          <div class="li-title">${d.getMonth()+1}月${d.getDate()}日 · 周${U.weekday(f.date)} · ${U.escape(f.lesson||'课程')}</div>
+          <div class="li-sub">${tags.join(' · ')||'查看详情'}</div>
+        </div>
+        <div class="li-arrow">›</div>
+      </div>`;
+  });
+
+  if(!listItems){
+    listItems='<div class="empty"><div class="ic">📭</div><div>暂无反馈记录</div></div>';
+  }
+
+  document.getElementById('main').innerHTML=`
+    <div class="student-header">
+      <div class="avatar">${U.escape(firstInitial)}</div>
+      <div class="name">${U.escape(s.name)}</div>
+      <div class="meta">${s.className?U.escape(s.className)+' · ':''}共 ${total} 条反馈 · ${goodCount} 次全优</div>
+    </div>
+    ${statsHtml}
+    <div class="list-section-title">📂 点击查看详细内容</div>
+    ${listItems}
+  `;
+  window.scrollTo(0,0);
+}
+
+/* ===== 打开某一条详情 ===== */
+function openItem(type,index){
+  session.currentView='detail';
+  document.getElementById('backBtn').classList.add('show');
+  const s=session.student;
+  const fbs=session.feedbacks;
+
+  let html='';
+  let title='';
+
+  if(type==='newAssess'){
+    title='📋 新生测评报告';
+    html=renderAssessCard(s.assessment,'📋 新生测评报告','linear-gradient(135deg,#E7EDFF,#F3F6FF)');
+  }else if(type==='stageAssess'){
+    const stages=s.stageAssessments||[];
+    const st=stages[index];
+    title=`📊 阶段测评（第${index+1}次）`;
+    html=renderAssessCard(st,title,'linear-gradient(135deg,#FFF4D6,#FFFBEF)');
+  }else if(type==='overview'){
+    title='📈 课堂表现一览';
+    html=renderOverview(fbs);
+  }else if(type==='feedback'){
+    const f=fbs[index];
+    const d=new Date(f.date);
+    title=`${d.getMonth()+1}月${d.getDate()}日 · 周${U.weekday(f.date)}`;
+    html=renderFeedbackDetail(f);
+  }
+
+  document.getElementById('topSub').textContent=title;
+  document.getElementById('main').innerHTML=`<div class="detail-view show">${html}</div>`;
+  window.scrollTo(0,0);
+}
+
+/* ===== 返回列表 ===== */
+function goBack(){
+  renderList();
+}
+
+/* ===== 渲染测评卡片 ===== */
+function renderAssessCard(a,title,bgGradient){
+  if(!a)return '<div class="empty">暂无测评数据</div>';
+  return `
     <div class="assess-card" style="background:${bgGradient};">
       <div class="assess-title">${title}</div>
       <div class="assess-date">测评日期：${U.fmtDate(a.date)}</div>
@@ -276,28 +420,20 @@ function renderFeedbacks(){
       </div>
       ${a.analysis?`<div class="assess-analysis">${U.escape(a.analysis)}</div>`:''}
     </div>`;
-  };
+}
 
-  document.getElementById('main').innerHTML=`
-    <div class="student-header">
-      <div class="avatar">${U.escape(firstInitial)}</div>
-      <div class="name">${U.escape(s.name)}</div>
-      <div class="meta">${s.className?U.escape(s.className)+' · ':''}共 ${total} 条反馈 · ${goodCount} 次全优</div>
-    </div>
-
-    ${a?renderAssessCard(a,'📋 新生测评报告','linear-gradient(135deg,#E7EDFF,#F3F6FF)'):''}
-
-    ${stages.length>0?stages.map((st,i)=>renderAssessCard(st,`📊 阶段测评（第${i+1}次）`,'linear-gradient(135deg,#FFF4D6,#FFFBEF)')).join(''):''}
-
+/* ===== 渲染课堂表现一览 ===== */
+function renderOverview(fbs){
+  const hasExam=fbs.some(f=>f.dictation||f.quiz||f.assessment);
+  return `
     <div class="stats-row">
-      <div class="stat"><div class="lbl">本月反馈</div><div class="val num">${countThisMonth(fbs)}</div></div>
       <div class="stat"><div class="lbl">作业完成率</div><div class="val num">${rate(fbs,'homeworkDone')}</div></div>
       <div class="stat"><div class="lbl">认真听讲率</div><div class="val num">${rate(fbs,'attentive')}</div></div>
+      <div class="stat"><div class="lbl">积极互动率</div><div class="val num">${rate(fbs,'participated')}</div></div>
     </div>
-
     <div class="card">
       <h3 style="font-size:15px;margin:0 0 10px;"><span style="display:inline-block;width:6px;height:6px;background:var(--primary);border-radius:50%;margin-right:6px;"></span>课堂表现一览</h3>
-      ${fbs.length===0?'<div class="empty" style="padding:20px;">暂无反馈记录</div>':`
+      ${fbs.length===0?'<div class="empty" style="padding:20px;">暂无记录</div>':`
       <div style="overflow-x:auto;">
         <table class="fb-table">
           <tr>
@@ -323,22 +459,32 @@ function renderFeedbacks(){
           }).join('')}
         </table>
       </div>`}
-    </div>
+    </div>`;
+}
 
-    <div class="card">
-      <h3 style="font-size:15px;margin:0 0 10px;"><span style="display:inline-block;width:6px;height:6px;background:var(--primary);border-radius:50%;margin-right:6px;"></span>逐课详细反馈</h3>
-      ${fbs.length===0?'<div class="empty" style="padding:20px;">暂无详细反馈</div>':fbs.map(f=>`
-        <div class="detail-card">
-          <div class="header">
-            <div class="date">${U.fmtDate(f.date)} · 周${U.weekday(f.date)} · ${U.escape(f.lesson||'')}</div>
-          </div>
-          ${f.homeworkDetail?`<div style="font-size:13px;color:var(--green);margin:6px 0;font-weight:500;">📝 作业情况：${U.escape(f.homeworkDetail)}</div>`:''}
-          <div class="content">${U.escape(f.generated||'暂无详细内容')}</div>
+/* ===== 渲染单条反馈详情 ===== */
+function renderFeedbackDetail(f){
+  const d=new Date(f.date);
+  return `
+    <div class="detail-card">
+      <div class="header">
+        <div class="date">${U.fmtDate(f.date)} · 周${U.weekday(f.date)} · ${U.escape(f.lesson||'课程')}</div>
+      </div>
+      ${f.homeworkDetail?`<div style="font-size:13px;color:var(--green);margin:6px 0;font-weight:500;">📝 作业情况：${U.escape(f.homeworkDetail)}</div>`:''}
+      <div style="margin:8px 0;">
+        ${f.homeworkDone?'<span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;background:#D1FAE5;color:var(--green);margin-right:6px;margin-bottom:4px;">✓ 作业完成</span>':'<span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;background:#FEE2E2;color:var(--red);margin-right:6px;margin-bottom:4px;">✗ 作业未完成</span>'}
+        ${f.attentive?'<span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;background:#D1FAE5;color:var(--green);margin-right:6px;margin-bottom:4px;">✓ 认真听讲</span>':'<span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;background:#FEF3C7;color:var(--yellow);margin-right:6px;margin-bottom:4px;">! 听讲需提醒</span>'}
+        ${f.participated?'<span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;background:#D1FAE5;color:var(--green);margin-right:6px;margin-bottom:4px;">✓ 积极互动</span>':'<span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;background:#FEF3C7;color:var(--yellow);margin-bottom:4px;">! 互动待加强</span>'}
+      </div>
+      ${f.dictation||f.quiz||f.assessment?`
+        <div style="margin:8px 0;padding:10px;background:#F9FAFC;border-radius:8px;font-size:13px;">
+          ${f.dictation?`<div>📝 听写：${U.escape(f.dictation)}</div>`:''}
+          ${f.quiz?`<div>📋 小测：${U.escape(f.quiz)}</div>`:''}
+          ${f.assessment?`<div>📊 测评：${U.escape(f.assessment)}</div>`:''}
         </div>
-      `).join('')}
-    </div>
-  `;
-  window.scrollTo(0,0);
+      `:''}
+      <div class="content">${U.escape(f.generated||'暂无详细内容')}</div>
+    </div>`;
 }
 
 function countThisMonth(fbs){
