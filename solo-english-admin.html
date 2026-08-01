@@ -1384,7 +1384,7 @@ function renderClassScheduleSheet(cid){
         return `<div class="list-item">
           <div class="top-line">
             <div>
-              <div class="name">第${l.idx}节 · ${d.getMonth()+1}月${d.getDate()}日 · 周${['日','一','二','三','四','五','六'][d.getDay()]} ${isToday?'<span class="tag green">今天</span>':''} ${movedTag}</div>
+              <div class="name">第${i+1}节 · ${d.getMonth()+1}月${d.getDate()}日 · 周${['日','一','二','三','四','五','六'][d.getDay()]} ${isToday?'<span class="tag green">今天</span>':''} ${movedTag}</div>
               <div class="meta">${l.time}${l.note?' · '+U.escape(l.note):''}${isPast?' · 已上':''}</div>
             </div>
             <div style="display:flex;gap:4px;">
