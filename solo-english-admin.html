@@ -427,21 +427,16 @@ function statusOfClass(c){
    表示把 8/5 这节调到 8/7。
 */
 function getClassLessonCount(c){
-  // 班级课次 = max(班级绑定的课包, 班级里所有学生报名课次的最大值)
-  let maxLessons = 0;
+  // 一对一/一对二班级：使用手动填的 totalLessons
+  if(c.classType==='private1'||c.classType==='private2'){
+    return c.totalLessons||10;
+  }
+  // 常规班：使用课程包次数
   if(c.packageId){
     const p=getPackage(c.packageId);
-    if(p&&p.lessons>maxLessons) maxLessons = p.lessons;
+    if(p) return p.lessons;
   }
-  if(c.totalLessons&&c.totalLessons>maxLessons) maxLessons = c.totalLessons;
-  // 看所有学生报名这个班的最大次数
-  (c.studentIds||[]).forEach(sid=>{
-    const ens = D.enrollments.filter(e=>e.studentId===sid);
-    ens.forEach(e=>{
-      if(e.totalLessons&&e.totalLessons>maxLessons) maxLessons = e.totalLessons;
-    });
-  });
-  return maxLessons||10; // 兜底
+  return c.totalLessons||10; // 兜底
 }
 function getClassSchedule(c){
   const total = getClassLessonCount(c);
@@ -698,7 +693,7 @@ Pages.schedule = function(){
         <div class="top-line">
           <div>
             <div class="name">${U.escape(c.name)} <span class="tag ${st.cls}">${st.label}</span></div>
-            <div class="meta">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time} · ${c.duration}分钟 · ${c.level}${p?` · ${p.lessons}次`:''}</div>
+            <div class="meta">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time} · ${c.duration}分钟 · ${c.level}${c.classType==='private1'?' · 一对一':c.classType==='private2'?' · 一对二':''}${c.classType!=='regular'&&c.totalLessons?` · ${c.totalLessons}次`:(p?` · ${p.lessons}次`:'')}</div>
             <div class="meta">学员：${c.studentIds.map(id=>{const s=getStudent(id); return s?U.escape(s.name):'?';}).join('、')||'<span class="muted">空</span>'}</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;">
@@ -809,7 +804,7 @@ Pages.classes = function(){
           <div>
             <div class="name">${U.escape(c.name)} <span class="tag ${st.cls}">${st.label}</span></div>
             <div class="meta">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time} · ${c.duration}分钟</div>
-            <div class="meta">${c.level} · ${c.studentIds.length}${c.maxStudents?'/'+c.maxStudents:''}人${p?` · ${p.lessons}次`:''}</div>
+            <div class="meta">${c.level}${c.classType==='private1'?' · 一对一':c.classType==='private2'?' · 一对二':''} · ${c.studentIds.length}${c.maxStudents?'/'+c.maxStudents:''}人${c.classType!=='regular'&&c.totalLessons?` · ${c.totalLessons}次`:(p?` · ${p.lessons}次`:'')}</div>
           </div>
           <button class="btn sm secondary" onclick="openEditClass('${c.id}')">编辑</button>
         </div>
@@ -1199,9 +1194,19 @@ function openAddClass(){
           <option>Speak Up</option><option>口语</option><option>其他</option>
         </select>
       </div>
-      <div class="field"><label>最多人数</label><input class="input" id="cMax" type="number" value="6"/></div>
+      <div class="field"><label>班级类型</label>
+        <select class="input" id="cType" onchange="onClassTypeChange()">
+          <option value="regular">常规班</option>
+          <option value="private1">一对一</option>
+          <option value="private2">一对二</option>
+        </select>
+      </div>
     </div>
-    <div class="field"><label>关联课程包（决定总课次）</label>
+    <div class="grid2">
+      <div class="field"><label>最多人数</label><input class="input" id="cMax" type="number" value="6"/></div>
+      <div class="field" id="cLessonsWrap" style="display:none;"><label>总课次（自填）</label><input class="input" id="cLessons" type="number" value="10" placeholder="如：9"/></div>
+    </div>
+    <div class="field" id="cPkgWrap"><label>关联课程包（决定总课次）</label>
       <select class="input" id="cPkg">
         <option value="">不关联</option>
         ${D.packages.map(p=>`<option value="${p.id}">${U.escape(p.name)} (${p.lessons}次)</option>`).join('')}
@@ -1226,6 +1231,23 @@ function openAddClass(){
     </div>
   `);
 }
+function onClassTypeChange(){
+  const type=document.getElementById('cType').value;
+  const lessonsWrap=document.getElementById('cLessonsWrap');
+  const pkgWrap=document.getElementById('cPkgWrap');
+  const maxInput=document.getElementById('cMax');
+  if(type==='regular'){
+    lessonsWrap.style.display='none';
+    pkgWrap.style.display='';
+    maxInput.value=6;
+    maxInput.disabled=false;
+  }else{
+    lessonsWrap.style.display='';
+    pkgWrap.style.display='none';
+    maxInput.value=type==='private1'?1:2;
+    maxInput.disabled=true;
+  }
+}
 function saveNewClass(){
   const name=document.getElementById('cName').value.trim();
   if(!name){U.toast('请输入班级名称');return;}
@@ -1233,19 +1255,22 @@ function saveNewClass(){
   const time=document.getElementById('cTime').value;
   const duration=+document.getElementById('cDur').value;
   const level=document.getElementById('cLevel').value;
-  const maxStudents=+document.getElementById('cMax').value||6;
-  const packageId=document.getElementById('cPkg').value||'';
+  const classType=document.getElementById('cType').value;
+  const maxStudents=classType==='private1'?1:classType==='private2'?2:(+document.getElementById('cMax').value||6);
+  const packageId=classType==='regular'?(document.getElementById('cPkg').value||''):'';
+  const totalLessons=classType!=='regular'?(+document.getElementById('cLessons').value||10):0;
   const startDate=document.getElementById('cStart').value||U.todayYmd();
   const conflict = detectConflict(weekday,time,duration,null);
   if(conflict){
     if(!confirm(`与班级「${conflict.name}」时间冲突（周${['日','一','二','三','四','五','六'][conflict.weekday]} ${conflict.time}）仍要保存？`)) return;
   }
-  const cls={id:U.id(),name,level,packageId,weekday,time,duration,maxStudents,startDate,studentIds:[],status:'招生中',note:''};
+  const cls={id:U.id(),name,level,packageId,weekday,time,duration,maxStudents,startDate,studentIds:[],status:'招生中',note:'',classType:classType,totalLessons:totalLessons};
   D.classes.push(cls);
   Store.save(); closeSheet(); navigate('schedule'); U.toast('已创建');
 }
 function openEditClass(id){
   const c=getClass(id); if(!c) return;
+  const ct=c.classType||'regular';
   openSheet(`
     <h2>编辑班级</h2>
     <div class="field"><label>班级名称</label><input class="input" id="eName" value="${U.escape(c.name)}"/></div>
@@ -1255,9 +1280,19 @@ function openEditClass(id){
           ${['启蒙','PowerUp1','PowerUp2','PowerUp3','PowerUp4','KET进阶','KET强化','KET冲刺','Speak Up','口语','其他'].map(l=>`<option ${c.level===l?'selected':''}>${l}</option>`).join('')}
         </select>
       </div>
-      <div class="field"><label>最多人数</label><input class="input" id="eMax" type="number" value="${c.maxStudents}"/></div>
+      <div class="field"><label>班级类型</label>
+        <select class="input" id="eType" onchange="onEditClassTypeChange()">
+          <option value="regular" ${ct==='regular'?'selected':''}>常规班</option>
+          <option value="private1" ${ct==='private1'?'selected':''}>一对一</option>
+          <option value="private2" ${ct==='private2'?'selected':''}>一对二</option>
+        </select>
+      </div>
     </div>
-    <div class="field"><label>关联课程包（决定总课次）</label>
+    <div class="grid2">
+      <div class="field"><label>最多人数</label><input class="input" id="eMax" type="number" value="${c.maxStudents}" ${ct!=='regular'?'disabled':''}/></div>
+      <div class="field" id="eLessonsWrap" style="display:${ct!=='regular'?'':'none'};"><label>总课次（自填）</label><input class="input" id="eLessons" type="number" value="${c.totalLessons||10}" placeholder="如：9"/></div>
+    </div>
+    <div class="field" id="ePkgWrap" style="display:${ct==='regular'?'':'none'};"><label>关联课程包（决定总课次）</label>
       <select class="input" id="ePkg">
         <option value="">不关联</option>
         ${D.packages.map(p=>`<option value="${p.id}" ${c.packageId===p.id?'selected':''}>${U.escape(p.name)} (${p.lessons}次)</option>`).join('')}
@@ -1280,12 +1315,36 @@ function openEditClass(id){
     </div>
   `);
 }
+function onEditClassTypeChange(){
+  const type=document.getElementById('eType').value;
+  const lessonsWrap=document.getElementById('eLessonsWrap');
+  const pkgWrap=document.getElementById('ePkgWrap');
+  const maxInput=document.getElementById('eMax');
+  if(type==='regular'){
+    lessonsWrap.style.display='none';
+    pkgWrap.style.display='';
+    maxInput.disabled=false;
+  }else{
+    lessonsWrap.style.display='';
+    pkgWrap.style.display='none';
+    maxInput.value=type==='private1'?1:2;
+    maxInput.disabled=true;
+  }
+}
 function saveEditClass(id){
   const c=getClass(id);
   c.name=document.getElementById('eName').value.trim()||c.name;
   c.level=document.getElementById('eLevel').value;
-  c.maxStudents=+document.getElementById('eMax').value||c.maxStudents;
-  c.packageId=document.getElementById('ePkg').value||'';
+  c.classType=document.getElementById('eType').value;
+  if(c.classType==='regular'){
+    c.maxStudents=+document.getElementById('eMax').value||6;
+    c.packageId=document.getElementById('ePkg').value||'';
+    c.totalLessons=0;
+  }else{
+    c.maxStudents=c.classType==='private1'?1:2;
+    c.packageId='';
+    c.totalLessons=+document.getElementById('eLessons').value||10;
+  }
   c.weekday=+document.getElementById('eWd').value;
   c.time=document.getElementById('eTime').value;
   c.duration=+document.getElementById('eDur').value;
@@ -1314,7 +1373,7 @@ function renderClassScheduleSheet(cid){
 
   openSheet(`
     <h2>${U.escape(c.name)}</h2>
-    <div class="sheet-sub">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time} · ${c.duration}分钟 · ${p?p.lessons+'次课':'未绑定课程包'} · ${c.studentIds.length}人</div>
+    <div class="sheet-sub">周${['日','一','二','三','四','五','六'][c.weekday]} ${c.time} · ${c.duration}分钟 · ${(c.classType==='private1'?'一对一':c.classType==='private2'?'一对二':'常规班')} · ${(c.classType!=='regular')?(c.totalLessons+'次课'):(p?p.lessons+'次课':'未绑定课程包')} · ${c.studentIds.length}人</div>
     <h3 style="font-size:14px;margin:0 0 8px;">全部课程（${lessons.length}节）</h3>
     <div style="max-height:48vh;overflow-y:auto;">
       ${lessons.map((l,i)=>{
