@@ -515,9 +515,36 @@ Pages.dashboard = function(){
   });
   const monthDropInCount = monthDropIn.length;
   const monthDropInRevenue = monthDropIn.reduce((s,a)=>s+(a.amount||0),0);
-  const monthIncome = D.payments.filter(p=>{
-    const d=new Date(p.date); return d>=monthStart && d<monthEnd;
-  }).reduce((a,p)=>a+p.paidAmount,0);
+
+  // 本月消课收入 = 本月每次消课的单价之和
+  // 单价 = 课包总金额 / 课包总次数
+  function getLessonRevenue(att){
+    if(att.isDropIn) return att.amount||0;
+    const ens=getStudentEnrollments(att.studentId);
+    const e = ens.find(en=>en.id===att.enrollmentId) || ens[0];
+    if(!e) return 0;
+    const p = e.packageId ? getPackage(e.packageId) : null;
+    const totalAmount = (D.payments.find(pay=>pay.enrollmentId===e.id)||{}).totalAmount || (p?p.amount:0);
+    const totalLessons = e.totalLessons || (p?p.lessons:1);
+    if(!totalLessons) return 0;
+    return Math.round(totalAmount/totalLessons);
+  }
+  const monthLessonRevenue = monthAtt.reduce((s,a)=>s+getLessonRevenue(a),0) + monthDropInRevenue;
+  const monthIncome = monthLessonRevenue;
+
+  // 未消课金额 = 所有报名总金额 - 已消课金额
+  let totalEnrolledAmount = 0;
+  let totalDeductedAmount = 0;
+  D.enrollments.forEach(e=>{
+    const pay = D.payments.find(p=>p.enrollmentId===e.id);
+    const amt = pay ? pay.totalAmount : 0;
+    totalEnrolledAmount += amt;
+    const p = e.packageId ? getPackage(e.packageId) : null;
+    const totalL = e.totalLessons || (p?p.lessons:1);
+    if(totalL>0) totalDeductedAmount += Math.round(amt * e.used / totalL);
+  });
+  const unearnedAmount = totalEnrolledAmount - totalDeductedAmount;
+
   // pending installments
   const pending = D.payments.filter(p=>p.paidAmount<p.totalAmount)
     .reduce((a,p)=>a+(p.totalAmount-p.paidAmount),0);
@@ -551,17 +578,18 @@ Pages.dashboard = function(){
 
   <div class="grid2">
     <div class="stat green">
-      <div class="lbl">本月收入</div>
+      <div class="lbl">本月消课收入</div>
       <div class="val num">${U.fmtMoney(monthIncome)}</div>
+      <div class="muted" style="font-size:11px;margin-top:2px;">消课 ${monthDeductCount} 次 · 散课 ${monthDropInCount} 次</div>
     </div>
     <div class="stat orange">
-      <div class="lbl">待缴余款</div>
-      <div class="val num">${U.fmtMoney(pending)}</div>
+      <div class="lbl">未消课金额</div>
+      <div class="val num">${U.fmtMoney(unearnedAmount)}</div>
+      <div class="muted" style="font-size:11px;margin-top:2px;">报名总额 ${U.fmtMoney(totalEnrolledAmount)} · 已消课 ${U.fmtMoney(totalDeductedAmount)}</div>
     </div>
     <div class="stat yellow">
-      <div class="lbl">本月消课</div>
-      <div class="val num">${monthDeductCount}<span class="unit">次</span></div>
-      <div class="muted" style="font-size:11px;margin-top:2px;">体系课 ${monthDeductCount} · 散课 ${monthDropInCount}（${U.fmtMoney(monthDropInRevenue)}）</div>
+      <div class="lbl">待缴余款</div>
+      <div class="val num">${U.fmtMoney(pending)}</div>
     </div>
     <div class="stat">
       <div class="lbl">在读学生</div>
@@ -922,30 +950,83 @@ Pages.income = function(){
   const today = new Date();
   const ms = new Date(today.getFullYear(),today.getMonth(),1);
   const me = new Date(today.getFullYear(),today.getMonth()+1,1);
-  const monthIncome = D.payments.filter(p=>{const d=new Date(p.date); return d>=ms && d<me;}).reduce((a,p)=>a+p.paidAmount,0);
-  const totalIncome = D.payments.reduce((a,p)=>a+p.paidAmount,0);
+
+  // 消课收入计算
+  function getLessonRevenue(att){
+    if(att.isDropIn) return att.amount||0;
+    const ens=getStudentEnrollments(att.studentId);
+    const e = ens.find(en=>en.id===att.enrollmentId) || ens[0];
+    if(!e) return 0;
+    const p = e.packageId ? getPackage(e.packageId) : null;
+    const totalAmount = (D.payments.find(pay=>pay.enrollmentId===e.id)||{}).totalAmount || (p?p.amount:0);
+    const totalLessons = e.totalLessons || (p?p.lessons:1);
+    if(!totalLessons) return 0;
+    return Math.round(totalAmount/totalLessons);
+  }
+
+  // 本月消课收入
+  const monthAtt = D.attendances.filter(a=>{
+    const d=new Date(a.date); return d>=ms && d<me && a.deduct;
+  });
+  const monthDropIn = D.attendances.filter(a=>{
+    const d=new Date(a.date); return d>=ms && d<me && a.isDropIn && a.attendance==='出席';
+  });
+  const monthLessonRevenue = monthAtt.reduce((s,a)=>s+getLessonRevenue(a),0);
+  const monthDropInRevenue = monthDropIn.reduce((s,a)=>s+(a.amount||0),0);
+  const monthIncome = monthLessonRevenue + monthDropInRevenue;
+
+  // 累计消课收入
+  const allDeductAtt = D.attendances.filter(a=>a.deduct);
+  const allDropIn = D.attendances.filter(a=>a.isDropIn && a.attendance==='出席');
+  const totalLessonRevenue = allDeductAtt.reduce((s,a)=>s+getLessonRevenue(a),0);
+  const totalDropInRevenue = allDropIn.reduce((s,a)=>s+(a.amount||0),0);
+  const totalIncome = totalLessonRevenue + totalDropInRevenue;
+
+  // 未消课金额
+  let totalEnrolledAmount = 0;
+  let totalDeductedAmount = 0;
+  D.enrollments.forEach(e=>{
+    const pay = D.payments.find(p=>p.enrollmentId===e.id);
+    const amt = pay ? pay.totalAmount : 0;
+    totalEnrolledAmount += amt;
+    const p = e.packageId ? getPackage(e.packageId) : null;
+    const totalL = e.totalLessons || (p?p.lessons:1);
+    if(totalL>0) totalDeductedAmount += Math.round(amt * e.used / totalL);
+  });
+  const unearnedAmount = totalEnrolledAmount - totalDeductedAmount;
+
   const pending = D.payments.filter(p=>p.paidAmount<p.totalAmount);
 
-  // by student
+  // by student (消课收入)
   const byStudent = {};
-  D.payments.forEach(p=>{ byStudent[p.studentId]=(byStudent[p.studentId]||0)+p.paidAmount; });
-  // by class (paid -> enrollment -> student -> classes)
+  allDeductAtt.forEach(a=>{
+    byStudent[a.studentId] = (byStudent[a.studentId]||0) + getLessonRevenue(a);
+  });
+  allDropIn.forEach(a=>{
+    byStudent[a.studentId] = (byStudent[a.studentId]||0) + (a.amount||0);
+  });
+
+  // by class (消课收入)
   const byClass = {};
-  D.payments.forEach(p=>{
-    const s=getStudent(p.studentId);
-    if(!s) return;
-    const cls = D.classes.filter(c=>c.studentIds.includes(s.id));
-    cls.forEach(c=>{ byClass[c.id]=(byClass[c.id]||0)+p.paidAmount/cls.length; });
+  allDeductAtt.forEach(a=>{
+    const c = D.classes.find(cl=>cl.id===a.classId);
+    if(c) byClass[c.id] = (byClass[c.id]||0) + getLessonRevenue(a);
+  });
+  allDropIn.forEach(a=>{
+    const c = D.classes.find(cl=>cl.id===a.classId);
+    if(c) byClass[c.id] = (byClass[c.id]||0) + (a.amount||0);
   });
 
   return `
   <div class="card">
-    <h3><span class="dot"></span>收入概览</h3>
+    <h3><span class="dot"></span>收入概览（按消课计算）</h3>
     <div class="grid2">
-      <div class="stat green"><div class="lbl">本月收入</div><div class="val num">${U.fmtMoney(monthIncome)}</div></div>
-      <div class="stat"><div class="lbl">累计收入</div><div class="val num">${U.fmtMoney(totalIncome)}</div></div>
-      <div class="stat orange"><div class="lbl">待缴余款</div><div class="val num">${U.fmtMoney(pending.reduce((a,p)=>a+(p.totalAmount-p.paidAmount),0))}</div></div>
-      <div class="stat yellow"><div class="lbl">缴费笔数</div><div class="val num">${D.payments.length}</div></div>
+      <div class="stat green"><div class="lbl">本月消课收入</div><div class="val num">${U.fmtMoney(monthIncome)}</div>
+        <div class="muted" style="font-size:11px;margin-top:2px;">体系课 ${monthAtt.length}次 · 散课 ${monthDropIn.length}次</div></div>
+      <div class="stat"><div class="lbl">累计消课收入</div><div class="val num">${U.fmtMoney(totalIncome)}</div></div>
+      <div class="stat orange"><div class="lbl">未消课金额</div><div class="val num">${U.fmtMoney(unearnedAmount)}</div>
+        <div class="muted" style="font-size:11px;margin-top:2px;">报名 ${U.fmtMoney(totalEnrolledAmount)} · 已消课 ${U.fmtMoney(totalDeductedAmount)}</div></div>
+      <div class="stat yellow"><div class="lbl">待缴余款</div><div class="val num">${U.fmtMoney(pending.reduce((a,p)=>a+(p.totalAmount-p.paidAmount),0))}</div></div>
     </div>
   </div>
   ${pending.length>0?`
@@ -962,16 +1043,16 @@ Pages.income = function(){
     }).join('')}
   </div>`:''}
   <div class="card">
-    <h3><span class="dot"></span>按学生 · 累计缴费</h3>
+    <h3><span class="dot"></span>按学生 · 消课收入</h3>
     <table class="table">
-      <tr><th>学生</th><th>累计</th></tr>
+      <tr><th>学生</th><th>累计消课收入</th></tr>
       ${D.students.map(s=>`<tr><td>${U.escape(s.name)}</td><td class="num">${U.fmtMoney(byStudent[s.id]||0)}</td></tr>`).join('')}
     </table>
   </div>
   <div class="card">
-    <h3><span class="dot"></span>按班级 · 累计缴费</h3>
+    <h3><span class="dot"></span>按班级 · 消课收入</h3>
     <table class="table">
-      <tr><th>班级</th><th>累计</th></tr>
+      <tr><th>班级</th><th>累计消课收入</th></tr>
       ${D.classes.map(c=>`<tr><td>${U.escape(c.name)}</td><td class="num">${U.fmtMoney(Math.round(byClass[c.id]||0))}</td></tr>`).join('')}
     </table>
   </div>
