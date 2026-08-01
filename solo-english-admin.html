@@ -427,11 +427,21 @@ function statusOfClass(c){
    表示把 8/5 这节调到 8/7。
 */
 function getClassLessonCount(c){
+  // 班级课次 = max(班级绑定的课包, 班级里所有学生报名课次的最大值)
+  let maxLessons = 0;
   if(c.packageId){
     const p=getPackage(c.packageId);
-    if(p) return p.lessons;
+    if(p&&p.lessons>maxLessons) maxLessons = p.lessons;
   }
-  return c.totalLessons||10; // 兜底
+  if(c.totalLessons&&c.totalLessons>maxLessons) maxLessons = c.totalLessons;
+  // 看所有学生报名这个班的最大次数
+  (c.studentIds||[]).forEach(sid=>{
+    const ens = D.enrollments.filter(e=>e.studentId===sid);
+    ens.forEach(e=>{
+      if(e.totalLessons&&e.totalLessons>maxLessons) maxLessons = e.totalLessons;
+    });
+  });
+  return maxLessons||10; // 兜底
 }
 function getClassSchedule(c){
   const total = getClassLessonCount(c);
