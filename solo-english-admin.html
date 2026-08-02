@@ -1852,23 +1852,27 @@ function undoAttendance(attId){
   const c=getClass(a.classId);
   const sName=s?s.name:'';
   const cName=c?c.name:'';
-  if(!confirm(`确认撤销这条消课记录？\n${sName} · ${cName} · ${a.date}\n${a.deduct?'课时会加回去':''}`))return;
+  const refundInfo = (a.deduct && !a.isDropIn) ? '课时会加回去' : (a.isDropIn ? '散课记录（课时不变）' : '未扣课（无需恢复）');
+  if(!confirm(`确认撤销这条消课记录？\n${sName} · ${cName} · ${a.date}\n${refundInfo}`))return;
   // 如果扣过课，把课时加回去
   if(a.deduct && !a.isDropIn){
     const ens=getStudentEnrollments(a.studentId);
-    // 从最后一个有 used 的报名记录开始还
+    let refunded=false;
     for(let i=ens.length-1;i>=0;i--){
       const e=ens[i];
       if(e.used>0){
-        e.used-=1; e.remaining+=1; break;
+        e.used-=1; e.remaining+=1; refunded=true; break;
       }
     }
+    if(!refunded){U.toast('⚠️ 未找到可恢复的报名记录');}
   }
   // 删除这条考勤记录
   D.attendances=D.attendances.filter(x=>x.id!==attId);
   Store.save();
-  navigate(currentPage);
-  U.toast('已撤销消课，课时已还原');
+  // 强制重新渲染当前页
+  const pg=currentPage;
+  navigate(pg);
+  U.toast('已撤销消课');
 }
 function quickByClass(){
   const cid=document.getElementById('clsSel').value;
