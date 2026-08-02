@@ -767,8 +767,9 @@ Pages.attendance = function(){
             <div class="name">${U.escape(s?s.name:'?')} · ${U.escape(c?c.name:'')}</div>
             <div class="meta">${a.date} · ${a.attendance} ${a.deduct?'· 扣课':''} ${a.makeUp?'· 补课':''}</div>
           </div>
-          <div>
+          <div style="display:flex;align-items:center;gap:6px;">
             ${a.deduct?'<span class="tag green">-1</span>':'<span class="tag gray">未扣</span>'}
+            <button class="btn sm ghost" onclick="undoAttendance('${a.id}')">撤销</button>
           </div>
         </div>
       </div>`;
@@ -1843,6 +1844,31 @@ function commitClassAttend(cid,date){
   Store.save(); closeSheet();
   U.toast(`已提交：扣课 ${deducted} 人${madeUp?`，补课 ${madeUp} 人`:''}`);
   navigate(currentPage);
+}
+function undoAttendance(attId){
+  const a=D.attendances.find(x=>x.id===attId);
+  if(!a){U.toast('记录不存在');return;}
+  const s=getStudent(a.studentId);
+  const c=getClass(a.classId);
+  const sName=s?s.name:'';
+  const cName=c?c.name:'';
+  if(!confirm(`确认撤销这条消课记录？\n${sName} · ${cName} · ${a.date}\n${a.deduct?'课时会加回去':''}`))return;
+  // 如果扣过课，把课时加回去
+  if(a.deduct && !a.isDropIn){
+    const ens=getStudentEnrollments(a.studentId);
+    // 从最后一个有 used 的报名记录开始还
+    for(let i=ens.length-1;i>=0;i--){
+      const e=ens[i];
+      if(e.used>0){
+        e.used-=1; e.remaining+=1; break;
+      }
+    }
+  }
+  // 删除这条考勤记录
+  D.attendances=D.attendances.filter(x=>x.id!==attId);
+  Store.save();
+  navigate(currentPage);
+  U.toast('已撤销消课，课时已还原');
 }
 function quickByClass(){
   const cid=document.getElementById('clsSel').value;
