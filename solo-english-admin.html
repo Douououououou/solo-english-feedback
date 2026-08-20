@@ -1463,10 +1463,14 @@ function renderClassScheduleSheet(cid){
         const isToday = l.date===todayStr;
         const isPast = l.date<todayStr;
         const movedTag = l.moved?'<span class="tag yellow">已调</span>':'';
+        // 检查该节课是否已有消课记录
+        const attRecs=D.attendances.filter(a=>a.classId===cid && a.date===l.date);
+        const deductedRecs=attRecs.filter(a=>a.deduct);
+        const attTag = attRecs.length>0?(deductedRecs.length>0?`<span class="tag green">已消${deductedRecs.length}人</span>`:'<span class="tag gray">已记录</span>'):'';
         return `<div class="list-item">
           <div class="top-line">
             <div>
-              <div class="name">第${i+1}节 · ${d.getMonth()+1}月${d.getDate()}日 · 周${['日','一','二','三','四','五','六'][d.getDay()]} ${isToday?'<span class="tag green">今天</span>':''} ${movedTag}</div>
+              <div class="name">第${i+1}节 · ${d.getMonth()+1}月${d.getDate()}日 · 周${['日','一','二','三','四','五','六'][d.getDay()]} ${isToday?'<span class="tag green">今天</span>':''} ${movedTag} ${attTag}</div>
               <div class="meta">${l.time}${l.note?' · '+U.escape(l.note):''}${isPast?' · 已上':''}</div>
             </div>
             <div style="display:flex;gap:4px;">
@@ -1567,9 +1571,10 @@ function openEditStudent(id){
   const s=getStudent(id); if(!s) return;
   const ens=getStudentEnrollments(id);
   const pmt = D.payments.filter(p=>p.studentId===id);
+  const totalLessons = ens.reduce((a,e)=>a+e.totalLessons,0);
   openSheet(`
     <h2>${U.escape(s.name)}</h2>
-    <div class="sheet-sub">剩余 ${getStudentRemaining(id)} 节 · 已消 ${getStudentUsed(id)} 节</div>
+    <div class="sheet-sub">总 ${totalLessons} 节 · 已消 ${getStudentUsed(id)} 节 · 剩余 ${getStudentRemaining(id)} 节</div>
     <div class="field"><label>姓名</label><input class="input" id="seName" value="${U.escape(s.name)}"/></div>
     <div class="field"><label>家长姓名</label><input class="input" id="seParent" value="${U.escape(s.parent)}"/></div>
     <div class="field"><label>家长电话</label><input class="input" id="sePhone" value="${U.escape(s.phone)}"/></div>
@@ -1577,7 +1582,8 @@ function openEditStudent(id){
     <div class="divider"></div>
     <h3 style="font-size:14px;margin:0 0 8px;">报名记录（${ens.length}）</h3>
     ${ens.map(e=>{const p=getPackage(e.packageId); return `<div class="list-item">
-      <div class="top-line"><div><div class="name">${U.escape(p?p.name:e.packageId)}</div><div class="meta">剩余 ${e.remaining}/${e.totalLessons}</div></div></div>
+      <div class="top-line"><div><div class="name">${U.escape(p?p.name:e.packageId)}</div><div class="meta">总 ${e.totalLessons} 节 · 已消 ${e.used} 节 · 剩 ${e.remaining} 节</div></div>
+      <button class="btn sm ghost" onclick="delEnrollment('${e.id}','${id}')">删除</button></div>
     </div>`;}).join('')||'<div class="muted">暂无报名</div>'}
     <div class="divider"></div>
     <h3 style="font-size:14px;margin:0 0 8px;">缴费记录（${pmt.length}）</h3>
@@ -1605,6 +1611,13 @@ function delStudent(id){
   D.attendances=D.attendances.filter(a=>a.studentId!==id);
   D.classes.forEach(c=>{c.studentIds=c.studentIds.filter(x=>x!==id); if(c.waitlist) c.waitlist=c.waitlist.filter(x=>x!==id);});
   Store.save(); closeSheet(); navigate('students'); U.toast('已删除');
+}
+function delEnrollment(eid,sid){
+  const e=D.enrollments.find(x=>x.id===eid);
+  if(!e)return;
+  if(!confirm(`删除这条报名记录？\n总 ${e.totalLessons} 节 · 已消 ${e.used} 节 · 剩 ${e.remaining} 节\n（剩余课时会一并清除，已消课时和出勤记录保留）`))return;
+  D.enrollments=D.enrollments.filter(x=>x.id!==eid);
+  Store.save(); closeSheet(); openEditStudent(sid); U.toast('已删除报名记录');
 }
 
 /* ============== Manage students in a class ============== */
@@ -1713,6 +1726,7 @@ function openQuickAttend(cid,date){
   openSheet(`
     <h2>消课 · ${U.escape(c.name)}</h2>
     <div class="sheet-sub">${date} · 勾选本节扣课的学生，未勾选视为请假/缺席不扣</div>
+    ${existing.length>0?`<div style="background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:10px;line-height:1.5;">⚠️ 该日期已有消课记录（已预填下方状态）。再次提交会<b>先退回原扣课、再按当前设置重扣</b>，不会重复扣课。如无需修改请点取消。</div>`:''}
     <div class="field" style="display:flex;gap:6px;">
       <button class="btn sm" onclick="setAllAttend(true)">整班到</button>
       <button class="btn sm secondary" onclick="setAllAttend(false)">整班不到</button>
@@ -1819,6 +1833,16 @@ function setMakeUp(sid){
 function commitClassAttend(cid,date){
   const c=getClass(cid);
   const inputs=[...document.querySelectorAll('#attList input[type=checkbox]')];
+  // 先把该班该日期已有记录扣掉的课时退回去（避免重复扣课）
+  const existingRecs=D.attendances.filter(a=>a.classId===cid && a.date===date);
+  existingRecs.forEach(a=>{
+    if(a.deduct && !a.isDropIn){
+      const ens=getStudentEnrollments(a.studentId);
+      for(let i=ens.length-1;i>=0;i--){
+        if(ens[i].used>0){ens[i].used-=1;ens[i].remaining+=1;break;}
+      }
+    }
+  });
   // remove existing records for this class+date
   D.attendances = D.attendances.filter(a=>!(a.classId===cid && a.date===date));
   let deducted=0, madeUp=0;
@@ -1925,6 +1949,17 @@ function commitSingleAttend(sid,date){
   const deduct=document.getElementById('sglDeduct').checked;
   const makeUp=document.getElementById('sglMakeUp').checked;
   const status=document.querySelector('.chip.on[data-st]').dataset.st;
+  // 同一学生+班级+日期只保留一条记录：先退回旧记录的扣课，避免重复扣
+  const existingRecs=D.attendances.filter(a=>a.studentId===sid && a.classId===cls && a.date===date);
+  existingRecs.forEach(a=>{
+    if(a.deduct && !a.isDropIn){
+      const ens=getStudentEnrollments(sid);
+      for(let i=ens.length-1;i>=0;i--){
+        if(ens[i].used>0){ens[i].used-=1;ens[i].remaining+=1;break;}
+      }
+    }
+  });
+  D.attendances=D.attendances.filter(a=>!(a.studentId===sid && a.classId===cls && a.date===date));
   D.attendances.push({id:U.id(),date,classId:cls,studentId:sid,attendance:status,deduct,makeUp});
   if(deduct){
     const ens=getStudentEnrollments(sid); let need=1;
