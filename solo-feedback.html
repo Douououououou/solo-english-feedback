@@ -237,9 +237,43 @@ const Store={
       if(resp.ok){
         const json=await resp.json();
         this.sha=json.sha;
-        this.data=JSON.parse(decodeURIComponent(escape(atob(json.content))));
+        const cloudData=JSON.parse(decodeURIComponent(escape(atob(json.content))));
+        // 合并保护：本地离线期间新增的数据不能被云端旧数据覆盖丢失
+        let needSync=false;
+        if(this.data && cloudData){
+          const localData=this.data;
+          // 1. 本地有而云端没有的反馈
+          const cloudFbIds=new Set((cloudData.feedbacks||[]).map(f=>f.id));
+          const localOnlyFbs=(localData.feedbacks||[]).filter(f=>!cloudFbIds.has(f.id));
+          if(localOnlyFbs.length>0){
+            cloudData.feedbacks=[...(cloudData.feedbacks||[]),...localOnlyFbs];
+            needSync=true;
+          }
+          // 2. 本地有而云端没有的学生
+          const cloudStuIds=new Set((cloudData.students||[]).map(s=>s.id));
+          const localOnlyStus=(localData.students||[]).filter(s=>!cloudStuIds.has(s.id));
+          if(localOnlyStus.length>0){
+            cloudData.students=[...(cloudData.students||[]),...localOnlyStus];
+            needSync=true;
+          }
+          // 3. 学生身上的离线修改（新生测评、阶段测评）
+          (cloudData.students||[]).forEach(cs=>{
+            const ls=(localData.students||[]).find(s=>s.id===cs.id);
+            if(ls){
+              if(ls.assessment && !cs.assessment){ cs.assessment=ls.assessment; needSync=true; }
+              const cloudStageIds=new Set((cs.stageAssessments||[]).map(a=>a.id));
+              const localStages=(ls.stageAssessments||[]).filter(a=>a.id&&!cloudStageIds.has(a.id));
+              if(localStages.length>0){ cs.stageAssessments=[...(cs.stageAssessments||[]),...localStages]; needSync=true; }
+            }
+          });
+        }
+        this.data=cloudData;
         // 缓存到 localStorage
         localStorage.setItem(LS_KEY,JSON.stringify({data:this.data,sha:this.sha}));
+        if(needSync){
+          U.toast('📋 检测到离线新增数据，正在合并上传...');
+          this.save();
+        }
         return;
       }else if(resp.status===401){
         // Token 失效
