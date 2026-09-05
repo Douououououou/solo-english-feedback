@@ -496,6 +496,31 @@ function classHasLessonOnDate(c, ymd){
 /* ============== Pages ============== */
 const Pages = {};
 
+/* ===== 按年统计每月已消课金额（课包消课 + 散课）===== */
+let dashYear = new Date().getFullYear();
+function getMonthlyRevenueByYear(){
+  const years={};
+  function ensure(y){ if(!years[y]) years[y]=Array.from({length:12},()=>({lesson:0,lessonCnt:0,dropIn:0,dropInCnt:0})); return years[y]; }
+  function attRevenue(att){
+    const ens=getStudentEnrollments(att.studentId);
+    const e = ens.find(en=>en.id===att.enrollmentId) || ens[0];
+    if(!e) return 0;
+    const p = e.packageId ? getPackage(e.packageId) : null;
+    const totalAmount = (D.payments.find(pay=>pay.enrollmentId===e.id)||{}).totalAmount || (p?p.amount:0);
+    const totalLessons = e.totalLessons || (p?p.lessons:1);
+    if(!totalLessons) return 0;
+    return Math.round(totalAmount/totalLessons);
+  }
+  D.attendances.forEach(a=>{
+    const d=new Date(a.date); if(isNaN(d.getTime())) return;
+    const row=ensure(d.getFullYear())[d.getMonth()];
+    if(a.isDropIn){ if(a.attendance==='出席'){ row.dropIn+=(a.amount||0); row.dropInCnt+=1; } }
+    else if(a.deduct){ row.lesson+=attRevenue(a); row.lessonCnt+=1; }
+  });
+  return years;
+}
+function dashYearShift(delta){ dashYear+=delta; navigate('dashboard'); }
+
 Pages.dashboard = function(){
   const today = new Date();
   const todayStr = U.todayYmd();
@@ -545,7 +570,14 @@ Pages.dashboard = function(){
   });
   const unearnedAmount = totalEnrolledAmount - totalDeductedAmount;
 
-  // pending installments
+  // 每月已消课金额（1-12月，可切换年份）
+  const revByYear = getMonthlyRevenueByYear();
+  const dashYearRows = revByYear[dashYear] || Array.from({length:12},()=>({lesson:0,lessonCnt:0,dropIn:0,dropInCnt:0}));
+  let dashYearLesson=0, dashYearDropIn=0, dashYearLessonCnt=0, dashYearDropInCnt=0;
+  dashYearRows.forEach(m=>{dashYearLesson+=m.lesson;dashYearDropIn+=m.dropIn;dashYearLessonCnt+=m.lessonCnt;dashYearDropInCnt+=m.dropInCnt;});
+  const dashYearTotal = dashYearLesson + dashYearDropIn;
+  const curYear = today.getFullYear(), curMonth = today.getMonth();
+  const isCurYear = dashYear===curYear;
   const pending = D.payments.filter(p=>p.paidAmount<p.totalAmount)
     .reduce((a,p)=>a+(p.totalAmount-p.paidAmount),0);
   // low balance
@@ -585,7 +617,7 @@ Pages.dashboard = function(){
     <div class="stat orange">
       <div class="lbl">未消课金额</div>
       <div class="val num">${U.fmtMoney(unearnedAmount)}</div>
-      <div class="muted" style="font-size:11px;margin-top:2px;">报名总额 ${U.fmtMoney(totalEnrolledAmount)} · 已消课 ${U.fmtMoney(totalDeductedAmount)}</div>
+      <div class="muted" style="font-size:11px;margin-top:2px;">报名总额 ${U.fmtMoney(totalEnrolledAmount)} · ${dashYear}年已消课 ${U.fmtMoney(dashYearTotal)}</div>
     </div>
     <div class="stat yellow">
       <div class="lbl">待缴余款</div>
@@ -595,6 +627,37 @@ Pages.dashboard = function(){
       <div class="lbl">在读学生</div>
       <div class="val num">${D.students.length}<span class="unit">人</span></div>
     </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="margin-bottom:8px;align-items:center;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button class="btn sm secondary" onclick="dashYearShift(-1)">‹</button>
+        <strong style="font-size:15px;">${dashYear}年 · 每月已消课金额</strong>
+        <button class="btn sm secondary" onclick="dashYearShift(1)">›</button>
+      </div>
+      <span class="tag orange">全年 ${U.fmtMoney(dashYearTotal)}</span>
+    </div>
+    <table class="table" style="font-size:13px;">
+      <tr><th>月份</th><th>消课</th><th>散课</th><th style="text-align:right;">合计</th></tr>
+      ${dashYearRows.map((m,i)=>{
+        const total=m.lesson+m.dropIn;
+        const isCur = isCurYear && i===curMonth;
+        return `<tr ${isCur?'style="background:var(--blue-soft);"':''}>
+          <td ${isCur?'style="font-weight:600;"':''}>${i+1}月${isCur?'<span class="tag blue" style="margin-left:4px;">本月</span>':''}</td>
+          <td class="num">${m.lessonCnt>0?U.fmtMoney(m.lesson):'—'}</td>
+          <td class="num">${m.dropInCnt>0?U.fmtMoney(m.dropIn):'—'}</td>
+          <td class="num" style="text-align:right;">${total>0?`<strong>${U.fmtMoney(total)}</strong>`:'—'}</td>
+        </tr>`;
+      }).join('')}
+      <tr style="font-weight:700;">
+        <td>全年合计</td>
+        <td class="num">${dashYearLessonCnt>0?U.fmtMoney(dashYearLesson):'—'}</td>
+        <td class="num">${dashYearDropInCnt>0?U.fmtMoney(dashYearDropIn):'—'}</td>
+        <td class="num" style="text-align:right;">${dashYearTotal>0?U.fmtMoney(dashYearTotal):'—'}</td>
+      </tr>
+    </table>
+    <div class="muted" style="font-size:11px;margin-top:6px;">消课按课包单价（总额÷次数）计算，散课按实收计。点 ‹ › 可切换年份查看。</div>
   </div>
 
   ${(lowStudents.length+noBalance.length)>0 ? `
@@ -1071,6 +1134,54 @@ Pages.income = function(){
   `;
 };
 
+Pages.yearIncome = function(){
+  const revByYear = getMonthlyRevenueByYear();
+  const years = Object.keys(revByYear).map(Number).sort((a,b)=>b-a);
+  const now = new Date();
+  const curYear = now.getFullYear(), curMonth = now.getMonth();
+  if(years.length===0){
+    return `<div class="card"><div class="empty"><div class="ic">📭</div>暂无消课记录</div></div>`;
+  }
+  return years.map(y=>{
+    const months = revByYear[y];
+    let tl=0, td=0, cl=0, cd=0;
+    months.forEach(m=>{tl+=m.lesson; td+=m.dropIn; cl+=m.lessonCnt; cd+=m.dropInCnt;});
+    const total = tl+td;
+    const isCurYear = y===curYear;
+    return `
+  <div class="card">
+    <div class="row" style="margin-bottom:8px;">
+      <div><strong style="font-size:16px;">${y}年 · 每月收入表</strong>${isCurYear?' <span class="tag green">今年</span>':''}
+        <div class="muted" style="font-size:12px;">消课 ${cl} 次 · 散课 ${cd} 次</div>
+      </div>
+      <span class="tag orange" style="font-size:13px;">全年 ${U.fmtMoney(total)}</span>
+    </div>
+    <table class="table" style="font-size:13px;">
+      <tr><th>月份</th><th>消课收入</th><th>散课收入</th><th style="text-align:right;">合计</th></tr>
+      ${months.map((m,i)=>{
+        const mTotal=m.lesson+m.dropIn;
+        const isCur = isCurYear && i===curMonth;
+        return `<tr ${isCur?'style="background:var(--blue-soft);"':''}>
+          <td ${isCur?'style="font-weight:600;"':''}>${i+1}月${isCur?'<span class="tag blue" style="margin-left:4px;">本月</span>':''}</td>
+          <td class="num">${m.lessonCnt>0?U.fmtMoney(m.lesson):'—'}</td>
+          <td class="num">${m.dropInCnt>0?U.fmtMoney(m.dropIn):'—'}</td>
+          <td class="num" style="text-align:right;">${mTotal>0?`<strong>${U.fmtMoney(mTotal)}</strong>`:'—'}</td>
+        </tr>`;
+      }).join('')}
+      <tr style="font-weight:700;">
+        <td>年度合计</td>
+        <td class="num">${cl>0?U.fmtMoney(tl):'—'}</td>
+        <td class="num">${cd>0?U.fmtMoney(td):'—'}</td>
+        <td class="num" style="text-align:right;">${U.fmtMoney(total)}</td>
+      </tr>
+    </table>
+  </div>`;
+  }).join('') + `
+  <div class="card">
+    <div class="muted" style="font-size:12px;">收入按消课计算：课包消课按单价（缴费总额÷课时数）计入当月，散课按实收金额计入当月。报名缴费不计入收入。</div>
+  </div>`;
+};
+
 Pages.prices = function(){
   // Show the full price list from the user image
   // Build a table for the user's image
@@ -1192,6 +1303,7 @@ Pages.more = function(){
     {page:'classSchedules',label:'班级课表',icon:'📅',desc:'查看各班完整排课',color:'primary'},
     {page:'statistics',label:'课时统计',icon:'📊',desc:'消课数据和剩余课时',color:'green'},
     {page:'income',label:'收入管理',icon:'💰',desc:'缴费记录和收入统计',color:'orange'},
+    {page:'yearIncome',label:'每年每月收入表',icon:'📈',desc:'按年份查看1-12月收入明细',color:'yellow'},
     {page:'prices',label:'价格表',icon:'🏷️',desc:'课程包定价和优惠',color:'pink'},
   ];
   return `
@@ -1237,9 +1349,9 @@ let currentPage = 'dashboard';
 function navigate(p, replace){
   currentPage = p;
   document.getElementById('main').innerHTML = Pages[p]();
-  [...document.querySelectorAll('.nav-btn')].forEach(t=>t.classList.toggle('active',t.dataset.page===p || (p==='students'&&t.dataset.page==='more') || (p==='statistics'&&t.dataset.page==='more') || (p==='income'&&t.dataset.page==='more') || (p==='prices'&&t.dataset.page==='more') || (p==='classSchedules'&&t.dataset.page==='more')));
+  [...document.querySelectorAll('.nav-btn')].forEach(t=>t.classList.toggle('active',t.dataset.page===p || (p==='students'&&t.dataset.page==='more') || (p==='statistics'&&t.dataset.page==='more') || (p==='income'&&t.dataset.page==='more') || (p==='prices'&&t.dataset.page==='more') || (p==='classSchedules'&&t.dataset.page==='more') || (p==='yearIncome'&&t.dataset.page==='more')));
   // update title
-  const titleMap={dashboard:'首页',schedule:'周课表',attendance:'消课',classes:'班级',students:'学生',statistics:'课时统计',income:'收入',prices:'价格表',classSchedules:'班级课表',more:'更多'};
+  const titleMap={dashboard:'首页',schedule:'周课表',attendance:'消课',classes:'班级',students:'学生',statistics:'课时统计',income:'收入',prices:'价格表',classSchedules:'班级课表',yearIncome:'每年每月收入表',more:'更多'};
   document.getElementById('topTitle').textContent = titleMap[p]||'教务';
   document.getElementById('topDate').textContent = '';
   document.getElementById('topRight').textContent = '';
