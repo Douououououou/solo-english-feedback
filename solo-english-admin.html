@@ -308,7 +308,7 @@ const Store = {
       version:1,
       settings:{ teacher:'Tina' },
       packages:[
-        {id:'p1',name:'启蒙包',type:'启蒙45次',lessons:45,amount:22500,earlyBird:18000,note:'9单元·45次'},
+        {id:'p1',name:'启蒙包',type:'启蒙45次',lessons:45,amount:22500,earlyBird:17100,note:'9单元·45次'},
         {id:'p2',name:'Power Up 1学期包',type:'PowerUp1学期15次',lessons:15,amount:9000,earlyBird:7500,note:'3单元/15次'},
         {id:'p3',name:'Power Up 2学期包',type:'PowerUp2学期15次',lessons:15,amount:9000,earlyBird:7500,note:'3单元/15次'},
         {id:'p4',name:'Power Up 3学期包',type:'PowerUp3学期15次',lessons:15,amount:9000,earlyBird:7500,note:'3单元/15次'},
@@ -520,6 +520,18 @@ function getMonthlyRevenueByYear(){
   return years;
 }
 function dashYearShift(delta){ dashYear+=delta; navigate('dashboard'); }
+
+/* 一键同步课程包价格（按最新价格表） */
+function syncPackagePrices(){
+  const targets=D.packages.filter(p=>/启蒙/.test(p.name||'') && p.lessons===45);
+  if(targets.length===0){ U.toast('未找到「启蒙」45次的课程包'); return; }
+  let msg='将按最新价格表更新：\n';
+  targets.forEach(p=>{ msg+='· '+(p.name||'未命名')+'：早鸟 '+U.fmtMoney(p.earlyBird||0)+' → ¥17,100（¥380/次）\n'; });
+  if(confirm(msg+'\n确认更新？')){
+    targets.forEach(p=>{ p.earlyBird=17100; });
+    Store.save(); navigate('prices'); U.toast('✓ 课程包早鸟价已更新，报名时自动生效');
+  }
+}
 
 Pages.dashboard = function(){
   const today = new Date();
@@ -1186,8 +1198,8 @@ Pages.prices = function(){
   // Show the full price list from the user image
   // Build a table for the user's image
   const rows = [
-    ['启蒙·包(45次)','45',22500,18000,36000,28800,54000,43200,'9单元·45次'],
-    ['Power Up·学期包','15',9000,7500,14400,12000,21600,18000,'3单元/15次'],
+    ['启蒙·包(45次)','45',22500,17100,36000,25200,54000,33750,'9单元·45次'],
+    ['Power Up·学期包','15',9000,7500,14400,9300,21600,13200,'3单元/15次'],
     ['KET·进阶','18',11700,9900,18720,15840,28080,23760,'第一阶段'],
     ['KET·强化','18',11700,9900,18720,15840,28080,23760,'第二阶段'],
     ['KET·冲刺','12',7800,6600,12480,10560,18720,15840,'第三阶段'],
@@ -1196,7 +1208,7 @@ Pages.prices = function(){
   return `
   <div class="card">
     <h3><span class="dot"></span>价格表</h3>
-    <div class="muted" style="margin-bottom:8px;">每生定价：小班基准 → 一对二 ×1.6 → 一对一 ×2.4（早鸟同理）</div>
+    <div class="muted" style="margin-bottom:8px;">原价：小班基准 → 一对二 ×1.6 → 一对一 ×2.4；早鸟价按最新海报价</div>
     <div style="overflow-x:auto;">
     <table class="table price-table">
       <tr><th>项目</th><th>次</th><th>小班·原</th><th>小班·早</th><th>1v2·原</th><th>1v2·早</th><th>1v1·原</th><th>1v1·早</th><th>备注</th></tr>
@@ -1212,6 +1224,7 @@ Pages.prices = function(){
       </tr>`).join('')}
     </table>
     </div>
+    <div class="muted" style="font-size:12px;margin-top:6px;">入学测评 + 试听：¥200（报名可抵扣）</div>
     <div class="divider"></div>
     <div class="muted" style="margin-bottom:6px;">单次散课</div>
     <table class="table">
@@ -1236,6 +1249,7 @@ Pages.prices = function(){
   <div class="card">
     <h3><span class="dot"></span>我的课程包</h3>
     <button class="btn sm" style="margin-bottom:8px;" onclick="openAddPackage()">+ 新增课程包</button>
+    <button class="btn sm secondary" style="margin-bottom:8px;margin-left:6px;" onclick="syncPackagePrices()">🔄 同步启蒙包早鸟价 ¥17,100</button>
     ${D.packages.map(p=>`<div class="list-item">
       <div class="top-line">
         <div>
